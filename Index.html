@@ -1,0 +1,2426 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>El Profe Victor - Portal Educativo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Definición de la paleta de colores estilo pizarrón */
+        :root {
+            --chalkboard-bg: #2E403D; /* Verde oscuro, como una pizarra */
+            --chalk-white: #F0F8F8;   /* Blanco tiza */
+            --chalk-yellow: #FDD835;  /* Amarillo tiza */
+            --chalk-green: #8BC34A;   /* Verde claro para elementos interactivos */
+            --chalk-gray: #B0BEC5;    /* Gris claro para detalles secundarios */
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--chalkboard-bg); /* Fondo principal de la pizarra */
+            color: var(--chalk-white); /* Texto general blanco tiza */
+            overflow-x: hidden; /* Previene scroll horizontal indeseado */
+        }
+
+        /* Ajustes generales para elementos de Tailwind para que coincidan con la paleta */
+        .bg-gradient-to-br.from-gray-900.via-gray-800.to-gray-900 {
+            background: linear-gradient(to bottom right, var(--chalkboard-bg), #263633); /* Degradado sutil */
+        }
+
+        .bg-gray-800 { background-color: rgba(46, 64, 61, 0.8); /* Fondo de tarjetas y paneles más transparente */ }
+        .bg-gray-700 { background-color: rgba(60, 80, 75, 0.8); /* Fondos de input y elementos internos */ }
+        .bg-gray-600 { background-color: rgba(80, 100, 95, 0.8); /* Bordes o estados hover */ }
+        
+        .border-gray-700 { border-color: rgba(90, 110, 105, 0.5); /* Bordes más suaves */ }
+        .border-gray-600 { border-color: rgba(110, 130, 125, 0.5); }
+        .border-gray-500 { border-color: rgba(130, 150, 145, 0.5); }
+
+        .text-red-500 { color: var(--chalk-yellow); /* Elementos destacados rojos ahora amarillos */ }
+        .text-red-400 { color: var(--chalk-yellow); }
+        .text-blue-500 { color: var(--chalk-green); /* Botones de acción azul ahora verde */ }
+        .hover\:text-blue-600:hover { color: var(--chalk-green); }
+        .focus\:ring-blue-500:focus { border-color: var(--chalk-green); ring-color: var(--chalk-green); }
+        
+        .bg-red-600 { background-color: var(--chalk-yellow); }
+        .hover\:bg-red-700:hover { background-color: #FFEA00; /* Amarillo más intenso */ }
+        .disabled\:bg-red-800:disabled { background-color: #C0A600; /* Amarillo apagado */ }
+
+        .bg-green-500 { background-color: var(--chalk-green); }
+        .hover\:bg-green-600:hover { background-color: #689F38; /* Verde más intenso */ }
+        .disabled\:bg-green-800:disabled { background-color: #4C782E; /* Verde apagado */ }
+
+        .bg-purple-600 { background-color: #5E35B1; /* Mantener púrpura para quizzes, o cambiar a un verde/amarillo */ }
+        .hover\:bg-purple-700:hover { background-color: #512DA8; }
+
+        .bg-orange-500 { background-color: var(--chalk-yellow); color: var(--chalkboard-bg); /* Amarillo con texto oscuro */ }
+        .hover\:bg-orange-600:hover { background-color: #FFEB3B; }
+
+
+        .text-gray-300 { color: var(--chalk-white); }
+        .text-gray-400 { color: var(--chalk-gray); }
+        .text-gray-500 { color: var(--chalk-gray); }
+        .text-gray-200 { color: var(--chalk-white); }
+
+        /* Estilos de notificación ajustados */
+        .bg-red-700 { background-color: rgba(220, 38, 38, 0.6); } /* Rojo para errores */
+        .bg-yellow-900 { background-color: rgba(253, 216, 53, 0.2); } /* Amarillo para advertencias */
+        .border-yellow-600 { border-color: rgba(253, 216, 53, 0.6); }
+
+        /* Estilos para el efecto de notificación */
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        /* Ocultar scrollbar en content-row */
+        .content-row::-webkit-scrollbar {
+            display: none;
+        }
+        .content-row {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+
+        /* Estilos para el menú móvil */
+        #mobile-menu {
+            transition: all 0.3s ease-in-out;
+            transform: translateY(-100%); /* Oculto por defecto */
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #mobile-menu.active {
+            transform: translateY(0); /* Visible */
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        @media (min-width: 768px) { /* md breakpoint */
+            #mobile-menu {
+                display: none !important; /* Ocultar en desktop */
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white flex flex-col items-center justify-center p-4">
+
+    <nav class="bg-gray-800 p-4 text-white shadow-lg border-b border-gray-700 fixed top-0 w-full z-40">
+        <div class="container mx-auto flex justify-between items-center">
+            <span id="nav-brand" class="text-xl font-bold cursor-pointer hover:text-red-400 transition-colors flex items-center space-x-2">
+                <span class="text-3xl mr-2">👨‍🏫</span>
+                <span class="text-2xl font-bold text-chalk-yellow">El Profe Victor</span>
+            </span>
+            
+            <div class="flex items-center space-x-6 md:flex"> <div id="user-info-section-desktop" class="flex items-center space-x-3 hidden md:flex">
+                    <div id="notification-bell-desktop" class="relative cursor-pointer">
+                        <span class="text-2xl">🔔</span>
+                        <span id="notification-count-desktop" class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full px-2 py-1 text-xs font-bold hidden animate-pulse">0</span>
+                    </div>
+                    <div class="text-sm bg-gray-700 px-3 py-2 rounded-lg">
+                        <span class="text-gray-300">Hola, </span>
+                        <span id="nav-username-desktop" class="text-white font-medium"></span>
+                        <span id="nav-user-role-desktop" class="text-red-400 ml-2"></span>
+                    </div>
+                </div>
+                <div id="auth-buttons-desktop" class="hidden md:flex space-x-2">
+                    <button id="nav-dashboard-btn-desktop" class="hover:text-gray-300 px-3 py-2 rounded transition-colors hidden">
+                        Dashboard
+                    </button>
+                    <button id="nav-create-assignment-btn-desktop" class="hover:text-gray-300 px-3 py-2 rounded transition-colors hidden">
+                        Crear Actividad
+                    </button>
+                    <button id="nav-create-quiz-btn-desktop" class="hover:text-gray-300 px-3 py-2 rounded transition-colors hidden">
+                        Crear Quiz
+                    </button>
+                    <button id="nav-logout-btn-desktop" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-md text-sm font-medium transition-colors hidden">
+                        Cerrar Sesión
+                    </button>
+                    <button id="nav-login-btn-desktop" class="hover:text-gray-300 px-3 py-2 rounded transition-colors">
+                        Iniciar Sesión
+                    </button>
+                    <button id="nav-register-btn-desktop" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-md text-sm font-medium transition-colors">
+                        Registrarse
+                    </button>
+                </div>
+            </div>
+
+            <button id="menu-toggle" class="md:hidden text-3xl text-white focus:outline-none">
+                ☰
+            </button>
+        </div>
+
+        <div id="mobile-menu" class="absolute top-16 left-0 w-full bg-gray-800 shadow-lg py-4 px-6 md:hidden z-30 flex flex-col space-y-4 items-center">
+            <div id="user-info-section-mobile" class="flex flex-col items-center space-y-2 hidden">
+                <div id="notification-bell-mobile" class="relative cursor-pointer">
+                    <span class="text-2xl">🔔</span>
+                    <span id="notification-count-mobile" class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full px-2 py-1 text-xs font-bold hidden animate-pulse">0</span>
+                </div>
+                <div class="text-sm bg-gray-700 px-3 py-2 rounded-lg text-center">
+                    <span class="text-gray-300">Hola, </span>
+                    <span id="nav-username-mobile" class="text-white font-medium"></span>
+                    <span id="nav-user-role-mobile" class="text-red-400 ml-2"></span>
+                </div>
+            </div>
+            <div id="auth-buttons-mobile" class="flex flex-col space-y-3 w-full items-center">
+                <button id="nav-dashboard-btn-mobile" class="hover:text-gray-300 px-3 py-2 rounded transition-colors hidden w-full text-center">
+                    Dashboard
+                </button>
+                <button id="nav-create-assignment-btn-mobile" class="hover:text-gray-300 px-3 py-2 rounded transition-colors hidden w-full text-center">
+                    Crear Actividad
+                </button>
+                <button id="nav-create-quiz-btn-mobile" class="hover:text-gray-300 px-3 py-2 rounded transition-colors hidden w-full text-center">
+                    Crear Quiz
+                </button>
+                <button id="nav-logout-btn-mobile" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-md text-sm font-medium transition-colors hidden w-full text-center">
+                    Cerrar Sesión
+                </button>
+                <button id="nav-login-btn-mobile" class="hover:text-gray-300 px-3 py-2 rounded transition-colors w-full text-center">
+                    Iniciar Sesión
+                </button>
+                <button id="nav-register-btn-mobile" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-md text-sm font-medium transition-colors w-full text-center">
+                    Registrarse
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div id="notification-toast-container" class="fixed top-20 right-4 z-50 space-y-2 max-w-sm">
+        </div>
+
+    <div id="app-content" class="w-full max-w-4xl mt-24 flex-grow"> 
+
+        <div id="loading-screen" class="min-h-screen flex items-center justify-center absolute inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 z-50">
+            <div class="text-center">
+                <div class="text-6xl mb-4 animate-bounce">🎓</div>
+                <h2 class="text-2xl font-bold text-white mb-2">Portal Educativo</h2>
+                <div class="flex items-center justify-center space-x-2 text-gray-400">
+                    <div class="animate-spin text-red-500">⏳</div>
+                    <span>Cargando...</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="login-view" class="bg-gray-800 p-8 rounded-xl shadow-2xl border border-gray-700 hidden mx-auto max-w-md">
+            <div class="text-center mb-6">
+                <div class="text-4xl mb-2">🎓</div>
+                <h2 class="text-3xl font-bold text-red-500">Iniciar Sesión</h2>
+                <p class="text-gray-400 text-sm mt-2">Accede a tu portal educativo</p>
+            </div>
+            <div id="login-error" class="bg-red-700 bg-opacity-50 border border-red-500 text-white p-3 rounded-md mb-4 text-sm hidden">
+                <span class="font-medium">❌ Error:</span> <span id="login-error-message"></span>
+            </div>
+            <form id="login-form" class="space-y-4">
+                <div>
+                    <label for="login-email" class="block text-gray-400 text-sm font-bold mb-2">Correo Electrónico</label>
+                    <input 
+                        type="email" 
+                        id="login-email" 
+                        placeholder="tu@correo.com" 
+                        required 
+                        class="w-full py-3 px-4 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all" 
+                    />
+                </div>
+                <div>
+                    <label for="login-password" class="block text-gray-400 text-sm font-bold mb-2">Contraseña</label>
+                    <input 
+                        type="password" 
+                        id="login-password" 
+                        placeholder="••••••••" 
+                        required 
+                        class="w-full py-3 px-4 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all" 
+                    />
+                </div>
+                <button 
+                    type="submit" 
+                    id="login-button"
+                    class="w-full bg-red-600 hover:bg-red-700 disabled:bg-red-800 text-white font-bold py-3 px-4 rounded-lg transition-colors duration-200"
+                >
+                    <span id="login-button-text">Ingresar</span>
+                    <span id="login-spinner" class="hidden animate-spin ml-2">⏳</span>
+                </button>
+            </form>
+            <p class="mt-6 text-center text-sm text-gray-400">
+                ¿No tienes cuenta? 
+                <button id="show-register" class="font-medium text-red-500 hover:text-red-400 ml-1 transition-colors">
+                    Regístrate aquí
+                </button>
+            </p>
+        </div>
+
+        <div id="register-view" class="bg-gray-800 p-8 rounded-xl shadow-2xl w-full max-w-md border border-gray-700 hidden mx-auto">
+            <div class="text-center mb-6">
+                <div class="text-4xl mb-2">✨</div>
+                <h2 class="text-3xl font-bold text-red-500">Crear Cuenta</h2>
+                <p class="text-gray-400 text-sm mt-2">Únete al portal educativo</p>
+            </div>
+            <div id="register-error" class="bg-red-700 bg-opacity-50 border border-red-500 text-white p-3 rounded-md mb-4 text-sm hidden">
+                <span class="font-medium">❌ Error:</span> <span id="register-error-message"></span>
+            </div>
+            <form id="register-form" class="space-y-4">
+                <div>
+                    <label for="register-name" class="block text-gray-400 text-sm font-bold mb-2">Nombre Completo</label>
+                    <input 
+                        type="text" 
+                        id="register-name" 
+                        placeholder="Tu Nombre Completo" 
+                        required 
+                        class="w-full py-3 px-4 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all" 
+                    />
+                </div>
+                <div>
+                    <label for="register-email" class="block text-gray-400 text-sm font-bold mb-2">Correo Electrónico</label>
+                    <input 
+                        type="email" 
+                        id="register-email" 
+                        placeholder="tu@correo.com" 
+                        required 
+                        class="w-full py-3 px-4 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all" 
+                    />
+                    <p class="text-xs text-gray-500 mt-1 bg-gray-700 bg-opacity-50 p-2 rounded">
+                        💡 Si eres profesor, usa tu correo institucional (ej: nombre@profesor.edu)
+                    </p>
+                </div>
+                <div>
+                    <label for="register-password" class="block text-gray-400 text-sm font-bold mb-2">Contraseña</label>
+                    <input 
+                        type="password" 
+                        id="register-password" 
+                        placeholder="Mínimo 6 caracteres" 
+                        required 
+                        class="w-full py-3 px-4 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all" 
+                    />
+                </div>
+                <button 
+                    type="submit" 
+                    id="register-button"
+                    class="w-full bg-red-600 hover:bg-red-700 disabled:bg-red-800 text-white font-bold py-3 px-4 rounded-lg transition-colors duration-200"
+                >
+                    <span id="register-button-text">Registrarse</span>
+                    <span id="register-spinner" class="hidden animate-spin ml-2">⏳</span>
+                </button>
+            </form>
+            <p class="mt-6 text-center text-sm text-gray-400">
+                ¿Ya tienes cuenta? 
+                <button id="show-login" class="font-medium text-red-500 hover:text-red-400 ml-1 transition-colors">
+                    Inicia sesión
+                </button>
+            </p>
+        </div>
+
+        <div id="dashboard-view" class="container mx-auto p-6 bg-gray-900 text-white hidden">
+            <h2 class="text-4xl font-bold mb-2 text-red-500 flex items-center space-x-3">
+                <span id="dashboard-icon"></span>
+                <span id="dashboard-title"></span>
+            </h2>
+            <p class="text-gray-300 text-lg mb-8">Bienvenido, <span id="dashboard-username" class="text-white font-medium"></span>. <span id="dashboard-subtitle"></span></p>
+
+            <div id="role-specific-content"></div>
+        </div>
+
+        <div id="create-assignment-view" class="container mx-auto p-6 bg-gray-900 text-white hidden">
+            <div class="max-w-2xl mx-auto">
+                <div class="mb-8">
+                    <h2 class="text-4xl font-bold mb-2 text-red-500 flex items-center space-x-3">
+                        <span>➕</span>
+                        <span>Crear Nueva Actividad</span>
+                    </h2>
+                    <p class="text-gray-300">Crea una nueva actividad para tus estudiantes</p>
+                </div>
+                <div class="bg-gray-800 p-8 rounded-xl shadow-2xl border border-gray-700">
+                    <form id="create-assignment-form" class="space-y-6">
+                        <div>
+                            <label for="assignment-title" class="block text-gray-400 text-sm font-bold mb-2">
+                                Título de la Actividad *
+                            </label>
+                            <input
+                                type="text"
+                                id="assignment-title"
+                                placeholder="Ej: Ensayo sobre la Literatura del Siglo XX"
+                                required
+                                class="w-full py-3 px-4 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+                            />
+                        </div>
+                        <div>
+                            <label for="assignment-description" class="block text-gray-400 text-sm font-bold mb-2">
+                                Descripción *
+                            </label>
+                            <textarea
+                                id="assignment-description"
+                                placeholder="Describe las instrucciones, objetivos y requisitos de la actividad..."
+                                required
+                                rows="6"
+                                class="w-full py-3 px-4 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all resize-none"
+                            ></textarea>
+                        </div>
+                        <div>
+                            <label for="assignment-due-date" class="block text-gray-400 text-sm font-bold mb-2">
+                                Fecha de Entrega *
+                            </label>
+                            <input
+                                type="datetime-local"
+                                id="assignment-due-date"
+                                required
+                                class="w-full py-3 px-4 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+                            />
+                        </div>
+                        <div id="create-assignment-file-upload-container">
+                            <label class="block text-gray-400 text-sm font-bold mb-2">Material de Apoyo (Opcional)</label>
+                            <div id="create-assignment-dropzone" class="relative border-2 border-dashed rounded-lg p-6 text-center transition-all duration-200 border-gray-600 hover:border-gray-500">
+                                <div class="space-y-3">
+                                    <div class="text-gray-400">
+                                        <svg class="mx-auto h-12 w-12" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                                            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                        </svg>
+                                    </div>
+                                    <div class="text-sm text-gray-300">
+                                        <span class="font-medium text-red-400 cursor-pointer">Haz clic para subir</span> o arrastra y suelta
+                                    </div>
+                                    <div class="text-xs text-gray-500">
+                                        .pdf,.doc,.docx,.txt,.jpg,.jpeg,.png hasta 10MB
+                                    </div>
+                                </div>
+                                <input type="file" id="create-assignment-file-input" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png">
+                            </div>
+                            <p id="create-assignment-file-error" class="text-red-400 text-sm mt-2 bg-red-900 bg-opacity-30 p-2 rounded hidden"></p>
+                            <div id="create-assignment-selected-file-display" class="mt-4"></div>
+                        </div>
+
+                        <div class="flex space-x-4 pt-4">
+                            <button
+                                type="button"
+                                id="cancel-create-assignment-btn"
+                                class="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors"
+                            >
+                                Cancelar
+                            </button>
+                            <button
+                                type="submit"
+                                id="submit-create-assignment-btn"
+                                class="flex-1 bg-green-500 hover:bg-green-600 disabled:bg-green-800 text-white font-bold py-3 px-6 rounded-lg transition-colors"
+                            >
+                                <span id="create-assignment-button-text">Crear Actividad</span>
+                                <span id="create-assignment-spinner" class="hidden animate-spin ml-2">⏳</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div id="submit-assignment-view" class="container mx-auto p-6 bg-gray-900 text-white hidden">
+            <div class="max-w-2xl mx-auto">
+                <div class="mb-8">
+                    <h2 class="text-4xl font-bold mb-2 text-red-500 flex items-center space-x-3">
+                        <span>📤</span>
+                        <span>Entregar Actividad</span>
+                    </h2>
+                    <p class="text-gray-300">Completa la actividad: <span id="submit-assignment-title" class="font-medium"></span></p>
+                </div>
+                <div class="bg-gray-800 p-8 rounded-xl shadow-2xl border border-gray-700">
+                    <p class="text-gray-300 text-sm mb-4" id="submit-assignment-description"></p>
+                    <div id="submit-assignment-material" class="mb-6"></div>
+
+                    <form id="submit-assignment-form" class="space-y-6">
+                        <div>
+                            <label for="submission-text" class="block text-gray-400 text-sm font-bold mb-2">Tu Respuesta (Opcional)</label>
+                            <textarea
+                                id="submission-text"
+                                placeholder="Escribe tu respuesta aquí..."
+                                rows="6"
+                                class="w-full py-3 px-4 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all resize-none"
+                            ></textarea>
+                        </div>
+                        <div id="submission-file-upload-container">
+                            <label class="block text-gray-400 text-sm font-bold mb-2">Subir Archivo de Entrega (Opcional)</label>
+                            <div id="submission-dropzone" class="relative border-2 border-dashed rounded-lg p-6 text-center transition-all duration-200 border-gray-600 hover:border-gray-500">
+                                <div class="space-y-3">
+                                    <div class="text-gray-400">
+                                        <svg class="mx-auto h-12 w-12" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                                            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                        </svg>
+                                    </div>
+                                    <div class="text-sm text-gray-300">
+                                        <span class="font-medium text-red-400 cursor-pointer">Haz clic para subir</span> o arrastra y suelta
+                                    </div>
+                                    <div class="text-xs text-gray-500">
+                                        .pdf,.doc,.docx,.txt,.jpg,.jpeg,.png hasta 10MB
+                                    </div>
+                                </div>
+                                <input type="file" id="submission-file-input" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png">
+                            </div>
+                            <p id="submission-file-error" class="text-red-400 text-sm mt-2 bg-red-900 bg-opacity-30 p-2 rounded hidden"></p>
+                            <div id="submission-selected-file-display" class="mt-4"></div>
+                        </div>
+
+                        <div class="flex space-x-4 pt-4">
+                            <button
+                                type="button"
+                                id="cancel-submit-assignment-btn"
+                                class="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors"
+                            >
+                                Cancelar
+                            </button>
+                            <button
+                                type="submit"
+                                id="submit-submission-btn"
+                                class="flex-1 bg-green-500 hover:bg-green-600 disabled:bg-green-800 text-white font-bold py-3 px-6 rounded-lg transition-colors"
+                            >
+                                <span id="submit-submission-button-text">Entregar Actividad</span>
+                                <span id="submit-submission-spinner" class="hidden animate-spin ml-2">⏳</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div id="create-quiz-view" class="container mx-auto p-6 bg-gray-900 text-white hidden">
+            <div class="max-w-2xl mx-auto">
+                <div class="mb-8">
+                    <h2 class="text-4xl font-bold mb-2 text-red-500 flex items-center space-x-3">
+                        <span>❓</span>
+                        <span>Crear Nuevo Quiz</span>
+                    </h2>
+                    <p class="text-gray-300">Diseña un nuevo cuestionario para tus estudiantes</p>
+                </div>
+                <div class="bg-gray-800 p-8 rounded-xl shadow-2xl border border-gray-700">
+                    <form id="create-quiz-form" class="space-y-6">
+                        <div>
+                            <label for="quiz-title" class="block text-gray-400 text-sm font-bold mb-2">
+                                Título del Quiz *
+                            </label>
+                            <input
+                                type="text"
+                                id="quiz-title"
+                                placeholder="Ej: Quiz de Historia del Siglo XX"
+                                required
+                                class="w-full py-3 px-4 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+                            />
+                        </div>
+                        <div>
+                            <label for="quiz-description" class="block text-gray-400 text-sm font-bold mb-2">
+                                Descripción *
+                            </label>
+                            <textarea
+                                id="quiz-description"
+                                placeholder="Describe el objetivo y las instrucciones del quiz..."
+                                required
+                                rows="4"
+                                class="w-full py-3 px-4 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all resize-none"
+                            ></textarea>
+                        </div>
+                        <div>
+                            <label for="quiz-due-date" class="block text-gray-400 text-sm font-bold mb-2">
+                                Fecha Límite *
+                            </label>
+                            <input
+                                type="datetime-local"
+                                id="quiz-due-date"
+                                required
+                                class="w-full py-3 px-4 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+                            />
+                        </div>
+
+                        <h3 class="text-xl font-bold text-gray-300 mt-8 mb-4 flex items-center space-x-2">
+                            <span>📝</span>
+                            <span>Preguntas del Quiz</span>
+                        </h3>
+                        <div id="questions-container" class="space-y-6 border border-gray-700 p-4 rounded-lg bg-gray-700 bg-opacity-30">
+                            <p class="text-gray-400 text-center" id="no-questions-message">Añade tu primera pregunta.</p>
+                        </div>
+                        <button type="button" id="add-question-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center space-x-2 mt-4">
+                            <span>➕</span>
+                            <span>Añadir Pregunta</span>
+                        </button>
+
+                        <div class="flex space-x-4 pt-4">
+                            <button
+                                type="button"
+                                id="cancel-create-quiz-btn"
+                                class="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors"
+                            >
+                                Cancelar
+                            </button>
+                            <button
+                                type="submit"
+                                id="submit-create-quiz-btn"
+                                class="flex-1 bg-green-500 hover:bg-green-600 disabled:bg-green-800 text-white font-bold py-3 px-6 rounded-lg transition-colors"
+                            >
+                                <span id="create-quiz-button-text">Crear Quiz</span>
+                                <span id="create-quiz-spinner" class="hidden animate-spin ml-2">⏳</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div id="solve-quiz-view" class="container mx-auto p-6 bg-gray-900 text-white hidden">
+            <div class="max-w-2xl mx-auto">
+                <div class="mb-8">
+                    <h2 class="text-4xl font-bold mb-2 text-red-500 flex items-center space-x-3">
+                        <span>🧠</span>
+                        <span>Resolver Quiz: <span id="solve-quiz-title" class="font-medium"></span></span>
+                    </h2>
+                    <p class="text-gray-300" id="solve-quiz-description"></p>
+                    <p class="text-gray-400 text-sm mt-2">Fecha límite: <span id="solve-quiz-due-date"></span></p>
+                </div>
+                <div class="bg-gray-800 p-8 rounded-xl shadow-2xl border border-gray-700">
+                    <form id="solve-quiz-form" class="space-y-6">
+                        <div id="quiz-questions-display" class="space-y-8">
+                            </div>
+                        <div class="flex space-x-4 pt-4">
+                            <button
+                                type="button"
+                                id="cancel-solve-quiz-btn"
+                                class="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition-colors"
+                            >
+                                Cancelar
+                            </button>
+                            <button
+                                type="submit"
+                                id="submit-solve-quiz-btn"
+                                class="flex-1 bg-green-500 hover:bg-green-600 disabled:bg-green-800 text-white font-bold py-3 px-6 rounded-lg transition-colors"
+                            >
+                                <span id="solve-quiz-button-text">Terminar Quiz</span>
+                                <span id="solve-quiz-spinner" class="hidden animate-spin ml-2">⏳</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-assignment-submissions-view" class="container mx-auto p-6 bg-gray-900 text-white hidden">
+            <div class="max-w-3xl mx-auto">
+                <div class="mb-8">
+                    <h2 class="text-4xl font-bold mb-2 text-red-500 flex items-center space-x-3">
+                        <span>📋</span>
+                        <span>Entregas para: <span id="submissions-assignment-title" class="font-medium"></span></span>
+                    </h2>
+                    <p class="text-gray-300">Aquí puedes revisar las entregas de tus estudiantes.</p>
+                </div>
+                <div class="flex flex-col space-y-4">
+                    <button id="back-to-teacher-dashboard-from-submissions" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg self-start transition-colors flex items-center space-x-2">
+                        <span>←</span>
+                        <span>Volver al Dashboard</span>
+                    </button>
+                    <div id="assignment-submissions-list" class="bg-gray-800 p-6 rounded-xl shadow-2xl border border-gray-700">
+                        <p id="no-submissions-message" class="text-gray-400 text-center text-lg hidden">Aún no hay entregas para esta actividad.</p>
+                        </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-quiz-results-view" class="container mx-auto p-6 bg-gray-900 text-white hidden">
+            <div class="max-w-3xl mx-auto">
+                <div class="mb-8">
+                    <h2 class="text-4xl font-bold mb-2 text-red-500 flex items-center space-x-3">
+                        <span>📊</span>
+                        <span>Resultados del Quiz: <span id="results-quiz-title" class="font-medium"></span></span>
+                    </h2>
+                    <p class="text-gray-300">Aquí puedes ver cómo les fue a tus estudiantes en este quiz.</p>
+                </div>
+                <div class="flex flex-col space-y-4">
+                    <button id="back-to-teacher-dashboard-from-quiz-results" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg self-start transition-colors flex items-center space-x-2">
+                        <span>←</span>
+                        <span>Volver al Dashboard</span>
+                    </button>
+                    <div id="quiz-results-list" class="bg-gray-800 p-6 rounded-xl shadow-2xl border border-gray-700">
+                        <p id="no-quiz-results-message" class="text-gray-400 text-center text-lg hidden">Aún no hay resultados para este quiz.</p>
+                        </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
+
+    <script>
+        // Configuración de Firebase (misma que proporcionaste)
+        const firebaseConfig = {
+            apiKey: "AIzaSyDujxWW8EV3z1lmynUGlWY5tCCEEkKIqLs",
+            authDomain: "portal-educativo-3e1cb.firebaseapp.com",
+            projectId: "portal-educativo-3e1cb",
+            storageBucket: "portal-educativo-3e1cb.firebasestorage.app",
+            messagingSenderId: "933443658678",
+            appId: "1:933443658678:web:311ad2e6c21178b6b01717"
+        };
+
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const storage = firebase.storage();
+
+        // --- Estado Global de la Aplicación (similar a useState en React) ---
+        let currentUser = null;
+        let currentUserRole = null;
+        let notifications = []; // { id, type, title, message, timestamp, read }
+        let currentAssignmentData = null; // Para la vista de crear/entregar actividad
+        let quizzes = []; // Para almacenar los quizzes del profesor
+        let currentQuizToSolve = null; // Para la vista de resolver quiz
+        let currentAssignmentToViewSubmissions = null; // Para la vista de entregas de actividad
+        let currentQuizToViewResults = null; // Para la vista de resultados de quiz
+
+        // --- Elementos del DOM Comunes ---
+        const loadingScreen = document.getElementById('loading-screen');
+        const loginView = document.getElementById('login-view');
+        const registerView = document.getElementById('register-view');
+        const dashboardView = document.getElementById('dashboard-view');
+        const createAssignmentView = document.getElementById('create-assignment-view');
+        const submitAssignmentView = document.getElementById('submit-assignment-view');
+        const createQuizView = document.getElementById('create-quiz-view');
+        const solveQuizView = document.getElementById('solve-quiz-view');
+        const viewAssignmentSubmissionsView = document.getElementById('view-assignment-submissions-view');
+        const viewQuizResultsView = document.getElementById('view-quiz-results-view'); // Nueva vista
+
+        // Navbar Elements
+        const navBrand = document.getElementById('nav-brand');
+        // Desktop Navbar Elements
+        const userInfoSectionDesktop = document.getElementById('user-info-section-desktop');
+        const navUsernameSpanDesktop = document.getElementById('nav-username-desktop');
+        const navUserRoleSpanDesktop = document.getElementById('nav-user-role-desktop');
+        const notificationBellDesktop = document.getElementById('notification-bell-desktop');
+        const notificationCountSpanDesktop = document.getElementById('notification-count-desktop');
+        const authButtonsDesktop = document.getElementById('auth-buttons-desktop');
+        const navDashboardBtnDesktop = document.getElementById('nav-dashboard-btn-desktop');
+        const navCreateAssignmentBtnDesktop = document.getElementById('nav-create-assignment-btn-desktop');
+        const navCreateQuizBtnDesktop = document.getElementById('nav-create-quiz-btn-desktop');
+        const navLogoutBtnDesktop = document.getElementById('nav-logout-btn-desktop');
+        const navLoginBtnDesktop = document.getElementById('nav-login-btn-desktop');
+        const navRegisterBtnDesktop = document.getElementById('nav-register-btn-desktop');
+
+        // Mobile Navbar Elements
+        const menuToggle = document.getElementById('menu-toggle');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const userInfoSectionMobile = document.getElementById('user-info-section-mobile');
+        const navUsernameSpanMobile = document.getElementById('nav-username-mobile');
+        const navUserRoleSpanMobile = document.getElementById('nav-user-role-mobile');
+        const notificationBellMobile = document.getElementById('notification-bell-mobile');
+        const notificationCountSpanMobile = document.getElementById('notification-count-mobile');
+        const authButtonsMobile = document.getElementById('auth-buttons-mobile');
+        const navDashboardBtnMobile = document.getElementById('nav-dashboard-btn-mobile');
+        const navCreateAssignmentBtnMobile = document.getElementById('nav-create-assignment-btn-mobile');
+        const navCreateQuizBtnMobile = document.getElementById('nav-create-quiz-btn-mobile');
+        const navLogoutBtnMobile = document.getElementById('nav-logout-btn-mobile');
+        const navLoginBtnMobile = document.getElementById('nav-login-btn-mobile');
+        const navRegisterBtnMobile = document.getElementById('nav-register-btn-mobile');
+
+
+        // Login Elements
+        const loginForm = document.getElementById('login-form');
+        const loginEmailInput = document.getElementById('login-email');
+        const loginPasswordInput = document.getElementById('login-password');
+        const loginButton = document.getElementById('login-button');
+        const loginButtonText = document.getElementById('login-button-text');
+        const loginSpinner = document.getElementById('login-spinner');
+        const loginErrorDiv = document.getElementById('login-error');
+        const loginErrorMessageSpan = document.getElementById('login-error-message');
+        const showRegisterButton = document.getElementById('show-register');
+
+        // Register Elements
+        const registerForm = document.getElementById('register-form');
+        const registerNameInput = document.getElementById('register-name');
+        const registerEmailInput = document.getElementById('register-email');
+        const registerPasswordInput = document.getElementById('register-password');
+        const registerButton = document.getElementById('register-button');
+        const registerButtonText = document.getElementById('register-button-text');
+        const registerSpinner = document.getElementById('register-spinner');
+        const registerErrorDiv = document.getElementById('register-error');
+        const registerErrorMessageSpan = document.getElementById('register-error-message');
+        const showLoginButton = document.getElementById('show-login');
+
+        // Dashboard Elements
+        const dashboardIcon = document.getElementById('dashboard-icon');
+        const dashboardTitle = document.getElementById('dashboard-title');
+        const dashboardUsername = document.getElementById('dashboard-username'); 
+        const dashboardSubtitle = document.getElementById('dashboard-subtitle');
+        const roleSpecificContent = document.getElementById('role-specific-content');
+
+        // Create Assignment Elements
+        const createAssignmentForm = document.getElementById('create-assignment-form');
+        const assignmentTitleInput = document.getElementById('assignment-title');
+        const assignmentDescriptionTextarea = document.getElementById('assignment-description');
+        const assignmentDueDateInput = document.getElementById('assignment-due-date');
+        const createAssignmentDropzone = document.getElementById('create-assignment-dropzone');
+        const createAssignmentFileInput = document.getElementById('create-assignment-file-input');
+        const createAssignmentFileError = document.getElementById('create-assignment-file-error');
+        const createAssignmentSelectedFileDisplay = document.getElementById('create-assignment-selected-file-display');
+        const cancelCreateAssignmentBtn = document.getElementById('cancel-create-assignment-btn');
+        const submitCreateAssignmentBtn = document.getElementById('submit-create-assignment-btn');
+        const createAssignmentButtonText = document.getElementById('create-assignment-button-text');
+        const createAssignmentSpinner = document.getElementById('create-assignment-spinner');
+        let fileToUploadForAssignment = null; // Variable para el archivo de la actividad
+
+        // Submit Assignment Elements
+        const submitAssignmentTitleSpan = document.getElementById('submit-assignment-title');
+        const submitAssignmentDescriptionP = document.getElementById('submit-assignment-description');
+        const submitAssignmentMaterialDiv = document.getElementById('submit-assignment-material');
+        const submitAssignmentForm = document.getElementById('submit-assignment-form');
+        const submissionTextInput = document.getElementById('submission-text');
+        const submissionDropzone = document.getElementById('submission-dropzone');
+        const submissionFileInput = document.getElementById('submission-file-input');
+        const submissionFileError = document.getElementById('submission-file-error');
+        const submissionSelectedFileDisplay = document.getElementById('submission-selected-file-display');
+        const cancelSubmitAssignmentBtn = document.getElementById('cancel-submit-assignment-btn');
+        const submitSubmissionBtn = document.getElementById('submit-submission-btn');
+        const submitSubmissionButtonText = document.getElementById('submit-submission-button-text');
+        const submitSubmissionSpinner = document.getElementById('submit-submission-spinner');
+        let fileToUploadForSubmission = null; // Variable para el archivo de la entrega
+
+        // Create Quiz Elements
+        const createQuizForm = document.getElementById('create-quiz-form');
+        const quizTitleInput = document.getElementById('quiz-title');
+        const quizDescriptionTextarea = document.getElementById('quiz-description');
+        const quizDueDateInput = document.getElementById('quiz-due-date');
+        const questionsContainer = document.getElementById('questions-container');
+        const noQuestionsMessage = document.getElementById('no-questions-message');
+        const addQuestionBtn = document.getElementById('add-question-btn');
+        const cancelCreateQuizBtn = document.getElementById('cancel-create-quiz-btn');
+        const submitCreateQuizBtn = document.getElementById('submit-create-quiz-btn');
+        const createQuizButtonText = document.getElementById('create-quiz-button-text');
+        const createQuizSpinner = document.getElementById('create-quiz-spinner');
+        let currentQuestions = []; // Array para almacenar las preguntas del quiz en creación
+
+        // Solve Quiz Elements
+        const solveQuizTitleSpan = document.getElementById('solve-quiz-title');
+        const solveQuizDescriptionP = document.getElementById('solve-quiz-description');
+        const solveQuizDueDateSpan = document.getElementById('solve-quiz-due-date');
+        const solveQuizForm = document.getElementById('solve-quiz-form');
+        const quizQuestionsDisplay = document.getElementById('quiz-questions-display');
+        const cancelSolveQuizBtn = document.getElementById('cancel-solve-quiz-btn');
+        const submitSolveQuizBtn = document.getElementById('submit-solve-quiz-btn');
+        const solveQuizButtonText = document.getElementById('solve-quiz-button-text');
+        const solveQuizSpinner = document.getElementById('solve-quiz-spinner');
+
+        // View Assignment Submissions Elements
+        const submissionsAssignmentTitleSpan = document.getElementById('submissions-assignment-title');
+        const assignmentSubmissionsList = document.getElementById('assignment-submissions-list');
+        const noSubmissionsMessage = document.getElementById('no-submissions-message');
+        const backToTeacherDashboardFromSubmissionsBtn = document.getElementById('back-to-teacher-dashboard-from-submissions');
+
+        // View Quiz Results Elements
+        const resultsQuizTitleSpan = document.getElementById('results-quiz-title');
+        const quizResultsList = document.getElementById('quiz-results-list');
+        const noQuizResultsMessage = document.getElementById('no-quiz-results-message');
+        const backToTeacherDashboardFromQuizResultsBtn = document.getElementById('back-to-teacher-dashboard-from-quiz-results');
+
+
+        // Notification Toast
+        const notificationToastContainer = document.getElementById('notification-toast-container');
+
+        // --- Funciones de Utilidad ---
+
+        // Función para añadir notificaciones
+        function addNotification(type, title, message) {
+            const id = Date.now();
+            const timestamp = new Date().toLocaleTimeString('es-ES');
+            const notification = { id, type, title, message, timestamp, read: false };
+            notifications.unshift(notification); // Añadir al principio
+
+            renderNotifications();
+
+            // Auto-dismiss after 5 seconds
+            setTimeout(() => {
+                dismissNotification(id);
+            }, 5000);
+        }
+
+        // Función para ocultar notificaciones
+        function dismissNotification(id) {
+            notifications = notifications.filter(n => n.id !== id);
+            renderNotifications();
+        }
+
+        // Renderizar notificaciones en el DOM
+        function renderNotifications() {
+            notificationToastContainer.innerHTML = '';
+            notifications.forEach(notification => {
+                const notificationDiv = document.createElement('div');
+                notificationDiv.className = `p-4 rounded-lg shadow-lg border-l-4 transform transition-all duration-300 ease-in-out ${
+                    notification.type === 'success' ? 'bg-green-800 border-green-500' :
+                    notification.type === 'warning' ? 'bg-yellow-800 border-yellow-500' :
+                    notification.type === 'error' ? 'bg-red-800 border-red-500' :
+                    'bg-blue-800 border-blue-500'
+                } text-white`;
+                notificationDiv.style.animation = 'slideInRight 0.3s ease-out';
+                notificationDiv.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <div class="flex-1">
+                            <h4 class="font-semibold text-sm mb-1">${notification.title}</h4>
+                            <p class="text-xs opacity-90 leading-relaxed">${notification.message}</p>
+                            <p class="text-xs opacity-75 mt-2">${notification.timestamp}</p>
+                        </div>
+                        <button
+                            class="ml-3 text-white hover:text-gray-300 text-lg font-bold leading-none"
+                            onclick="dismissNotification(${notification.id})"
+                        >
+                            ×
+                        </button>
+                    </div>
+                `;
+                notificationToastContainer.appendChild(notificationDiv);
+            });
+
+            // Actualizar contador de notificaciones
+            const unreadCount = notifications.filter(n => !n.read).length;
+            if (unreadCount > 0) {
+                // Update both desktop and mobile notification counts
+                notificationCountSpanDesktop.textContent = unreadCount;
+                notificationCountSpanDesktop.classList.remove('hidden');
+                notificationCountSpanMobile.textContent = unreadCount;
+                notificationCountSpanMobile.classList.remove('hidden');
+            } else {
+                notificationCountSpanDesktop.classList.add('hidden');
+                notificationCountSpanMobile.classList.add('hidden');
+            }
+        }
+
+        // Función para cambiar la vista principal
+        function showView(viewId) {
+            loadingScreen.classList.add('hidden'); // Siempre ocultar loading al mostrar una vista
+            loginView.classList.add('hidden');
+            registerView.classList.add('hidden');
+            dashboardView.classList.add('hidden');
+            createAssignmentView.classList.add('hidden');
+            submitAssignmentView.classList.add('hidden');
+            createQuizView.classList.add('hidden');
+            solveQuizView.classList.add('hidden');
+            viewAssignmentSubmissionsView.classList.add('hidden');
+            viewQuizResultsView.classList.add('hidden');
+            document.getElementById(viewId).classList.remove('hidden');
+
+            // Close mobile menu when changing view
+            mobileMenu.classList.remove('active');
+        }
+
+        // Funciones de manejo de errores mejoradas
+        function displayError(errorElement, message) {
+            if (errorElement) {
+                errorElement.classList.remove('hidden');
+                const messageSpan = errorElement.querySelector('span:last-child');
+                if (messageSpan) { // Para divs con un span interno (como login-error, register-error)
+                    messageSpan.textContent = message;
+                } else { // Para elementos que son directamente el contenedor del mensaje (como p#create-assignment-file-error)
+                    errorElement.textContent = `❌ Error: ${message}`;
+                }
+            }
+        }
+
+        function hideError(errorElement) {
+            if (errorElement) {
+                errorElement.classList.add('hidden');
+                const messageSpan = errorElement.querySelector('span:last-child');
+                if (messageSpan) {
+                    messageSpan.textContent = '';
+                } else {
+                    errorElement.textContent = '';
+                }
+            }
+        }
+
+        function setLoadingState(button, buttonTextSpan, spinnerSpan, isLoading) {
+            button.disabled = isLoading;
+            if (isLoading) {
+                buttonTextSpan.classList.add('hidden');
+                spinnerSpan.classList.remove('hidden');
+            } else {
+                buttonTextSpan.classList.remove('hidden');
+                spinnerSpan.classList.add('hidden');
+            }
+        }
+
+        function determineRole(email) {
+            return email.toLowerCase().includes('@profesor.edu') ? 'teacher' : 'student';
+        }
+
+        // Formato de fecha
+        function formatDate(timestamp) {
+            if (!timestamp) return 'N/A';
+            const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp.seconds * 1000);
+            return date.toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+        }
+        
+        // Manejo de Archivos (parte de FileUpload Component)
+        function getFileIcon(fileName) {
+            const extension = fileName.split('.').pop().toLowerCase();
+            switch (extension) {
+                case 'pdf': return '📄';
+                case 'doc': case 'docx': return '📝';
+                case 'txt': return '📃';
+                case 'jpg': case 'jpeg': return '🖼️';
+                default: return '📎';
+            }
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function renderFileDisplay(containerElement, file, downloadUrl, showDelete, onDeleteCallback) {
+            containerElement.innerHTML = ''; // Limpiar cualquier archivo anterior
+            if (!file && !downloadUrl) return;
+
+            const fileDisplayDiv = document.createElement('div');
+            fileDisplayDiv.className = "flex items-center justify-between p-4 bg-gray-700 rounded-lg border border-gray-600 hover:bg-gray-650 transition-colors";
+            fileDisplayDiv.innerHTML = `
+                <div class="flex items-center space-x-3">
+                    <span class="text-2xl">${getFileIcon(file ? file.name : 'Enlace')}</span>
+                    <div>
+                        <p class="text-sm font-medium text-gray-200 truncate max-w-48">${file ? file.name : 'Archivo adjunto'}</p>
+                        <p class="text-xs text-gray-400">${file ? formatFileSize(file.size) : ''}</p>
+                    </div>
+                </div>
+                <div class="flex space-x-2">
+                    ${downloadUrl ? `
+                        <a href="${downloadUrl}" target="_blank" rel="noopener noreferrer" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm transition-colors flex items-center space-x-1">
+                            <span>⬇</span>
+                            <span>Descargar</span>
+                        </a>` : ''}
+                    ${showDelete ? `
+                        <button class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm transition-colors flex items-center space-x-1" data-action="delete-file">
+                            <span>🗑️</span>
+                            <span>Eliminar</span>
+                        </button>` : ''}
+                </div>
+            `;
+            containerElement.appendChild(fileDisplayDiv);
+
+            if (showDelete && onDeleteCallback) {
+                fileDisplayDiv.querySelector('[data-action="delete-file"]').addEventListener('click', onDeleteCallback);
+            }
+        }
+        
+        // Función genérica para manejar la selección de archivos
+        function handleFileSelection(event, fileInput, dropzone, errorElement, displayElement, fileVarSetter, acceptedTypes, maxSize) {
+            hideError(errorElement);
+            let selectedFile;
+            if (event.type === 'drop') {
+                event.preventDefault(); // Evitar comportamiento predeterminado del navegador
+                selectedFile = event.dataTransfer.files[0];
+                dropzone.classList.remove('border-red-500', 'bg-red-50', 'bg-opacity-10', 'transform', 'scale-105');
+            } else { // 'change' event from input
+                selectedFile = fileInput.files[0];
+            }
+
+            if (!selectedFile) {
+                fileVarSetter(null);
+                displayElement.innerHTML = '';
+                return;
+            }
+
+            const allowedTypes = acceptedTypes.split(',').map(type => type.trim());
+            const fileExtension = '.' + selectedFile.name.split('.').pop().toLowerCase();
+            
+            if (!allowedTypes.includes(fileExtension)) {
+                displayError(errorElement, `Tipo de archivo no permitido. Tipos aceptados: ${acceptedTypes}`);
+                fileVarSetter(null);
+                displayElement.innerHTML = '';
+                return;
+            }
+
+            if (selectedFile.size > maxSize * 1024 * 1024) {
+                displayError(errorElement, `El archivo es muy grande. Tamaño máximo: ${maxSize}MB`);
+                fileVarSetter(null);
+                displayElement.innerHTML = '';
+                return;
+            }
+
+            fileVarSetter(selectedFile);
+            renderFileDisplay(displayElement, selectedFile, null, true, () => {
+                fileVarSetter(null);
+                displayElement.innerHTML = '';
+                fileInput.value = ''; // Reset input field
+                addNotification('info', 'Archivo removido', 'El archivo ha sido eliminado de la selección.');
+            });
+            addNotification('info', 'Archivo seleccionado', `${selectedFile.name} está listo para subir`);
+        }
+
+        // --- Manejadores de Autenticación y Carga Inicial ---
+
+        // Observador de estado de autenticación de Firebase
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                currentUser = user;
+                try {
+                    const userDoc = await db.collection('users').doc(user.uid).get();
+                    if (userDoc.exists) {
+                        const userData = userDoc.data();
+                        currentUserRole = userData.role;
+                        
+                        // Actualizar Navbar (Desktop)
+                        userInfoSectionDesktop.classList.remove('hidden');
+                        navUsernameSpanDesktop.textContent = userData.name || user.email;
+                        navUserRoleSpanDesktop.textContent = `(${userData.role === 'teacher' ? 'Profesor' : 'Estudiante'})`;
+                        navLoginBtnDesktop.classList.add('hidden');
+                        navRegisterBtnDesktop.classList.add('hidden');
+                        navDashboardBtnDesktop.classList.remove('hidden');
+                        navLogoutBtnDesktop.classList.remove('hidden');
+                        if (currentUserRole === 'teacher') {
+                            navCreateAssignmentBtnDesktop.classList.remove('hidden');
+                            navCreateQuizBtnDesktop.classList.remove('hidden');
+                        } else {
+                            navCreateAssignmentBtnDesktop.classList.add('hidden');
+                            navCreateQuizBtnDesktop.classList.add('hidden');
+                        }
+
+                        // Actualizar Navbar (Mobile)
+                        userInfoSectionMobile.classList.remove('hidden');
+                        navUsernameSpanMobile.textContent = userData.name || user.email;
+                        navUserRoleSpanMobile.textContent = `(${userData.role === 'teacher' ? 'Profesor' : 'Estudiante'})`;
+                        navLoginBtnMobile.classList.add('hidden');
+                        navRegisterBtnMobile.classList.add('hidden');
+                        navDashboardBtnMobile.classList.remove('hidden');
+                        navLogoutBtnMobile.classList.remove('hidden');
+                        if (currentUserRole === 'teacher') {
+                            navCreateAssignmentBtnMobile.classList.remove('hidden');
+                            navCreateQuizBtnMobile.classList.remove('hidden');
+                        } else {
+                            navCreateAssignmentBtnMobile.classList.add('hidden');
+                            navCreateQuizBtnMobile.classList.add('hidden');
+                        }
+
+
+                        renderDashboard(currentUserRole);
+                        showView('dashboard-view');
+                    } else {
+                        console.warn("Usuario autenticado pero sin datos en Firestore. Redirigiendo a login.");
+                        await auth.signOut();
+                        currentUser = null;
+                        currentUserRole = null;
+                        showView('login-view');
+                    }
+                } catch (error) {
+                    console.error("Error al obtener datos del usuario desde Firestore:", error);
+                    displayError(loginErrorDiv, "Error al cargar tu perfil.");
+                    await auth.signOut(); // Forzar cierre de sesión en caso de error de Firestore
+                    currentUser = null;
+                    currentUserRole = null;
+                    showView('login-view');
+                }
+            } else {
+                currentUser = null;
+                currentUserRole = null;
+                // Actualizar Navbar para no autenticado (Desktop)
+                userInfoSectionDesktop.classList.add('hidden');
+                navDashboardBtnDesktop.classList.add('hidden');
+                navCreateAssignmentBtnDesktop.classList.add('hidden');
+                navCreateQuizBtnDesktop.classList.add('hidden');
+                navLogoutBtnDesktop.classList.add('hidden');
+                navLoginBtnDesktop.classList.remove('hidden');
+                navRegisterBtnDesktop.classList.remove('hidden');
+
+                // Actualizar Navbar para no autenticado (Mobile)
+                userInfoSectionMobile.classList.add('hidden');
+                navDashboardBtnMobile.classList.add('hidden');
+                navCreateAssignmentBtnMobile.classList.add('hidden');
+                navCreateQuizBtnMobile.classList.add('hidden');
+                navLogoutBtnMobile.classList.add('hidden');
+                navLoginBtnMobile.classList.remove('hidden');
+                navRegisterBtnMobile.classList.remove('hidden');
+
+                showView('login-view');
+            }
+            loadingScreen.classList.add('hidden'); // Ocultar pantalla de carga una vez el estado de auth es conocido
+        });
+
+        // Login
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            hideError(loginErrorDiv);
+            setLoadingState(loginButton, loginButtonText, loginSpinner, true);
+
+            const email = loginEmailInput.value;
+            const password = loginPasswordInput.value;
+
+            try {
+                await auth.signInWithEmailAndPassword(email, password);
+                addNotification('success', 'Sesión iniciada', `Bienvenido.`);
+                // La lógica de mostrar el dashboard se maneja en onAuthStateChanged
+            } catch (error) {
+                console.error("Error al iniciar sesión:", error);
+                let errorMessage = "Error al iniciar sesión. Verifica tus credenciales.";
+                if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+                    errorMessage = "Correo o contraseña incorrectos.";
+                } else if (error.code === 'auth/invalid-email') {
+                    errorMessage = "Formato de correo electrónico inválido.";
+                }
+                displayError(loginErrorDiv, errorMessage);
+                addNotification('error', 'Error de Sesión', errorMessage);
+            } finally {
+                setLoadingState(loginButton, loginButtonText, loginSpinner, false);
+            }
+        });
+
+        // Registro
+        registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            hideError(registerErrorDiv);
+            setLoadingState(registerButton, registerButtonText, registerSpinner, true);
+
+            const name = registerNameInput.value;
+            const email = registerEmailInput.value;
+            const password = registerPasswordInput.value;
+            const role = determineRole(email);
+
+            try {
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                const user = userCredential.user;
+
+                await db.collection('users').doc(user.uid).set({
+                    name,
+                    email,
+                    role,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                addNotification('success', 'Cuenta creada', `¡Bienvenido ${name}! Tu cuenta ha sido creada exitosamente como ${role === 'teacher' ? 'Profesor' : 'Estudiante'}.`);
+                // La lógica de mostrar el dashboard se maneja en onAuthStateChanged
+            } catch (error) {
+                console.error("Error al registrarse:", error);
+                let errorMessage = "Error al registrarse. Intenta de nuevo.";
+                if (error.code === 'auth/email-already-in-use') {
+                    errorMessage = "El correo electrónico ya está en uso.";
+                } else if (error.code === 'auth/weak-password') {
+                    errorMessage = "La contraseña debe tener al menos 6 caracteres.";
+                } else if (error.code === 'auth/invalid-email') {
+                    errorMessage = "Formato de correo electrónico inválido.";
+                }
+                displayError(registerErrorDiv, errorMessage);
+                addNotification('error', 'Error de Registro', errorMessage);
+            } finally {
+                setLoadingState(registerButton, registerButtonText, registerSpinner, false);
+            }
+        });
+
+        // Cerrar Sesión
+        navLogoutBtnDesktop.addEventListener('click', async () => {
+            try {
+                await auth.signOut();
+                addNotification('info', 'Sesión cerrada', 'Has cerrado sesión exitosamente');
+            } catch (error) {
+                console.error("Error al cerrar sesión:", error);
+                addNotification('error', 'Error', 'Error al cerrar sesión');
+            }
+        });
+        navLogoutBtnMobile.addEventListener('click', async () => {
+            try {
+                await auth.signOut();
+                addNotification('info', 'Sesión cerrada', 'Has cerrado sesión exitosamente');
+            } catch (error) {
+                console.error("Error al cerrar sesión:", error);
+                addNotification('error', 'Error', 'Error al cerrar sesión');
+            }
+        });
+
+        // --- Funciones del Dashboard y Actividades/Quizzes ---
+
+        async function fetchAssignments() {
+            if (!currentUser) return [];
+            
+            let assignmentsQuery;
+            let assignmentsData = [];
+
+            try {
+                if (currentUserRole === 'teacher') {
+                    assignmentsQuery = db.collection('assignments')
+                        .where('teacherId', '==', currentUser.uid)
+                        .orderBy('createdAt', 'desc');
+                } else { // student
+                    assignmentsQuery = db.collection('assignments')
+                        .orderBy('createdAt', 'desc');
+                }
+                
+                const querySnapshot = await assignmentsQuery.get();
+                
+                for (const doc of querySnapshot.docs) {
+                    const assignmentData = { id: doc.id, ...doc.data() };
+                    
+                    if (currentUserRole === 'student') {
+                        const submissionQuery = db.collection('submissions')
+                            .where('assignmentId', '==', doc.id)
+                            .where('studentId', '==', currentUser.uid);
+                        const submissionSnapshot = await submissionQuery.get();
+                        assignmentData.submittedByUser = !submissionSnapshot.empty;
+                    } else if (currentUserRole === 'teacher') {
+                        const submissionQuery = db.collection('submissions')
+                            .where('assignmentId', '==', doc.id);
+                        const submissionSnapshot = await submissionQuery.get();
+                        assignmentData.submissionCount = submissionSnapshot.size;
+                    }
+                    assignmentsData.push(assignmentData);
+                }
+            } catch (error) {
+                console.error("Error fetching assignments:", error);
+                addNotification('error', 'Error', 'Error al cargar las actividades');
+            }
+            return assignmentsData;
+        }
+
+        async function fetchQuizzes() {
+            if (!currentUser) return [];
+            let quizzesData = [];
+            try {
+                if (currentUserRole === 'teacher') {
+                     const quizzesQuery = db.collection('quizzes')
+                        .where('teacherId', '==', currentUser.uid)
+                        .orderBy('createdAt', 'desc');
+                     const querySnapshot = await quizzesQuery.get();
+                     quizzesData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                } else { // student
+                    const quizzesQuery = db.collection('quizzes').orderBy('createdAt', 'desc');
+                    const querySnapshot = await quizzesQuery.get();
+                    
+                    for (const doc of querySnapshot.docs) {
+                        const quizData = { id: doc.id, ...doc.data() };
+                        const quizSubmissionQuery = db.collection('quiz_submissions')
+                            .where('quizId', '==', doc.id)
+                            .where('studentId', '==', currentUser.uid);
+                        const quizSubmissionSnapshot = await quizSubmissionQuery.get();
+                        quizData.submittedByUser = !quizSubmissionSnapshot.empty;
+                        quizData.score = quizSubmissionSnapshot.empty ? null : quizSubmissionSnapshot.docs[0].data().score;
+                        quizData.totalQuestions = quizSubmissionSnapshot.empty ? null : quizSubmissionSnapshot.docs[0].data().totalQuestions;
+                        quizzesData.push(quizData);
+                    }
+                }
+            } catch (error) {
+                console.error("Error fetching quizzes:", error);
+                addNotification('error', 'Error', 'Error al cargar los quizzes');
+            }
+            return quizzesData;
+        }
+
+
+        async function renderDashboard(role) {
+            dashboardUsername.textContent = currentUser.displayName || currentUser.email;
+            
+            // Limpiar contenido previo del rol
+            roleSpecificContent.innerHTML = '';
+
+            if (role === 'teacher') {
+                dashboardIcon.textContent = '👨‍🏫';
+                dashboardTitle.textContent = 'Panel del Profesor';
+                dashboardSubtitle.textContent = 'Administra tus actividades y quizzes desde aquí.';
+
+                const teacherAssignments = await fetchAssignments();
+                quizzes = await fetchQuizzes(); // Cargar quizzes para el profesor
+
+                let contentHTML = `
+                    <div class="mb-8 flex flex-wrap gap-4">
+                        <button id="teacher-create-new-assignment-btn" class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-lg transition-all duration-200 flex items-center space-x-2 shadow-lg hover:shadow-xl transform hover:scale-105">
+                            <span>➕</span>
+                            <span>Crear Nueva Actividad</span>
+                        </button>
+                        <button id="teacher-create-new-quiz-btn" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg transition-all duration-200 flex items-center space-x-2 shadow-lg hover:shadow-xl transform hover:scale-105">
+                            <span>❓</span>
+                            <span>Crear Nuevo Quiz</span>
+                        </button>
+                    </div>
+                    
+                    <h3 class="text-2xl font-semibold mb-6 text-gray-200 flex items-center space-x-2">
+                        <span>📚</span>
+                        <span>Actividades Creadas</span>
+                    </h3>
+                `;
+
+                if (teacherAssignments.length === 0) {
+                    contentHTML += `
+                        <div class="bg-gradient-to-r from-gray-800 to-gray-700 p-12 rounded-xl text-center border border-gray-600 mb-8">
+                            <div class="text-6xl mb-4">📝</div>
+                            <h4 class="text-xl font-semibold text-gray-300 mb-2">¡Comienza creando tu primera actividad!</h4>
+                            <p class="text-gray-400 mb-6">Las actividades aparecerán aquí una vez que las crees.</p>
+                            <button id="teacher-create-first-assignment-btn" class="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-medium transition-colors">
+                                Crear primera actividad
+                            </button>
+                        </div>
+                    `;
+                } else {
+                    contentHTML += `<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">`;
+                    teacherAssignments.forEach(assignment => {
+                        contentHTML += `
+                            <div class="bg-gradient-to-br from-gray-800 to-gray-700 p-6 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-600 hover:border-gray-500 transform hover:scale-105">
+                                <div class="flex justify-between items-start mb-3">
+                                    <h4 class="text-xl font-semibold text-red-400 line-clamp-2">${assignment.title}</h4>
+                                    <div class="text-2xl">🎯</div>
+                                </div>
+                                <p class="text-gray-400 mb-4 text-sm line-clamp-3 leading-relaxed">${assignment.description}</p>
+                                <div class="space-y-2 mb-4">
+                                    <div class="flex items-center space-x-2 text-xs">
+                                        <span>📅</span>
+                                        <span class="text-gray-500">Vence: ${formatDate(assignment.dueDate)}</span>
+                                    </div>
+                                    ${assignment.fileUrl ? `
+                                    <div class="flex items-center space-x-2 text-xs">
+                                        <span class="text-blue-400">📎</span>
+                                        <span class="text-blue-400">Material adjunto</span>
+                                    </div>` : ''}
+                                    <div class="flex items-center space-x-2 text-xs">
+                                        <span>👥</span>
+                                        <span class="text-gray-500">Entregas: ${assignment.submissionCount || 0}</span>
+                                    </div>
+                                </div>
+                                <button data-assignment-id="${assignment.id}" data-action="view-submissions" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 px-4 rounded-lg text-sm font-medium transition-all duration-200 flex items-center justify-center space-x-2">
+                                    <span>👁️</span>
+                                    <span>Ver Entregas (${assignment.submissionCount || 0})</span>
+                                </button>
+                            </div>
+                        `;
+                    });
+                    contentHTML += `</div>`;
+                }
+
+                // Sección de Quizzes (NUEVA)
+                contentHTML += `
+                    <h3 class="text-2xl font-semibold mb-6 text-gray-200 flex items-center space-x-2 mt-10">
+                        <span>❓</span>
+                        <span>Quizzes Creados</span>
+                    </h3>
+                `;
+
+                if (quizzes.length === 0) {
+                    contentHTML += `
+                        <div class="bg-gradient-to-r from-gray-800 to-gray-700 p-12 rounded-xl text-center border border-gray-600">
+                            <div class="text-6xl mb-4">🧠</div>
+                            <h4 class="text-xl font-semibold text-gray-300 mb-2">¡Crea tu primer quiz!</h4>
+                            <p class="text-gray-400 mb-6">Los quizzes aparecerán aquí una vez que los crees.</p>
+                            <button id="teacher-create-first-quiz-btn" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-medium transition-colors">
+                                Crear primer quiz
+                            </button>
+                        </div>
+                    `;
+                } else {
+                    contentHTML += `<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">`;
+                    quizzes.forEach(quiz => {
+                        contentHTML += `
+                            <div class="bg-gradient-to-br from-gray-800 to-gray-700 p-6 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-600 hover:border-gray-500 transform hover:scale-105">
+                                <div class="flex justify-between items-start mb-3">
+                                    <h4 class="text-xl font-semibold text-purple-400 line-clamp-2">${quiz.title}</h4>
+                                    <div class="text-2xl">🧠</div>
+                                </div>
+                                <p class="text-gray-400 mb-4 text-sm line-clamp-3 leading-relaxed">${quiz.description}</p>
+                                <div class="space-y-2 mb-4">
+                                    <div class="flex items-center space-x-2 text-xs">
+                                        <span>📅</span>
+                                        <span class="text-gray-500">Vence: ${formatDate(quiz.dueDate)}</span>
+                                    </div>
+                                    <div class="flex items-center space-x-2 text-xs">
+                                        <span>❓</span>
+                                        <span class="text-gray-500">Preguntas: ${quiz.questions ? quiz.questions.length : 0}</span>
+                                    </div>
+                                    </div>
+                                <button data-quiz-id="${quiz.id}" data-action="view-quiz-results" class="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 px-4 rounded-lg text-sm font-medium transition-all duration-200 flex items-center justify-center space-x-2">
+                                    <span>📊</span>
+                                    <span>Ver Resultados</span>
+                                </button>
+                            </div>
+                        `;
+                    });
+                    contentHTML += `</div>`;
+                }
+
+                roleSpecificContent.innerHTML = contentHTML;
+
+                // Añadir listeners específicos para el profesor
+                const createNewAssignmentBtn = document.getElementById('teacher-create-new-assignment-btn');
+                if (createNewAssignmentBtn) createNewAssignmentBtn.addEventListener('click', () => showCreateAssignmentView());
+                const createFirstAssignmentBtn = document.getElementById('teacher-create-first-assignment-btn');
+                if (createFirstAssignmentBtn) createFirstAssignmentBtn.addEventListener('click', () => showCreateAssignmentView());
+                
+                const createNewQuizBtn = document.getElementById('teacher-create-new-quiz-btn');
+                if (createNewQuizBtn) createNewQuizBtn.addEventListener('click', () => showCreateQuizView());
+                const createFirstQuizBtn = document.getElementById('teacher-create-first-quiz-btn');
+                if (createFirstQuizBtn) createFirstQuizBtn.addEventListener('click', () => showCreateQuizView());
+
+                // Añadir listeners para los botones de "Ver Entregas" de actividades (PROFESOR)
+                roleSpecificContent.querySelectorAll('[data-action="view-submissions"]').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const assignmentId = e.target.closest('[data-assignment-id]').dataset.assignmentId;
+                        showAssignmentSubmissionsView(assignmentId);
+                    });
+                });
+
+                // Añadir listeners para los botones de "Ver Resultados" de quizzes (PROFESOR)
+                roleSpecificContent.querySelectorAll('[data-action="view-quiz-results"]').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const quizId = e.target.closest('[data-quiz-id]').dataset.quizId;
+                        showQuizResultsView(quizId); // Llama a la nueva función
+                    });
+                });
+
+
+            } else { // student
+                dashboardIcon.textContent = '🎓';
+                dashboardTitle.textContent = 'Panel del Estudiante';
+                dashboardSubtitle.textContent = 'Aquí tienes tus actividades y quizzes.';
+
+                const studentAssignments = await fetchAssignments();
+                const studentQuizzes = await fetchQuizzes(); // Fetch quizzes for student
+
+                // Próximas Entregas (vencen en los próximos 3 días y no entregadas)
+                const today = new Date();
+                const threeDaysFromNow = new Date(today.getTime() + (3 * 24 * 60 * 60 * 1000));
+                const upcomingAssignments = studentAssignments.filter(a => {
+                    const dueDate = new Date(a.dueDate.seconds * 1000);
+                    return dueDate >= today && dueDate <= threeDaysFromNow && !a.submittedByUser;
+                });
+                const upcomingQuizzes = studentQuizzes.filter(q => {
+                    const dueDate = new Date(q.dueDate.seconds * 1000);
+                    return dueDate >= today && dueDate <= threeDaysFromNow && !q.submittedByUser;
+                });
+
+                let contentHTML = '';
+
+                if (upcomingAssignments.length > 0 || upcomingQuizzes.length > 0) {
+                    contentHTML += `
+                        <div class="mb-8 bg-yellow-900 bg-opacity-30 border border-yellow-600 rounded-xl p-6">
+                            <h3 class="text-xl font-semibold text-yellow-400 mb-3 flex items-center space-x-2">
+                                <span>⚠️</span>
+                                <span>Próximas Entregas y Quizzes</span>
+                            </h3>
+                            <p class="text-yellow-200 mb-4">Tienes ${upcomingAssignments.length} actividades y ${upcomingQuizzes.length} quizzes que vencen en los próximos 3 días.</p>
+                            <div class="space-y-3">
+                    `;
+                    upcomingAssignments.forEach(assignment => {
+                        contentHTML += `
+                            <div class="bg-yellow-800 bg-opacity-40 p-4 rounded-lg border border-yellow-500">
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <h4 class="font-semibold text-yellow-100">${assignment.title} (Actividad)</h4>
+                                        <p class="text-yellow-200 text-sm">
+                                            Vence: ${formatDate(assignment.dueDate)}
+                                        </p>
+                                    </div>
+                                    <button data-assignment-id="${assignment.id}" data-action="submit-assignment" class="bg-yellow-500 hover:bg-yellow-600 text-black px-4 py-2 rounded-lg font-medium transition-colors">
+                                        Entregar
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    upcomingQuizzes.forEach(quiz => {
+                        contentHTML += `
+                            <div class="bg-yellow-800 bg-opacity-40 p-4 rounded-lg border border-yellow-500">
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <h4 class="font-semibold text-yellow-100">${quiz.title} (Quiz)</h4>
+                                        <p class="text-yellow-200 text-sm">
+                                            Vence: ${formatDate(quiz.dueDate)}
+                                        </p>
+                                    </div>
+                                    <button data-quiz-id="${quiz.id}" data-action="solve-quiz" class="bg-yellow-500 hover:bg-yellow-600 text-black px-4 py-2 rounded-lg font-medium transition-colors">
+                                        Resolver
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    contentHTML += `</div></div>`;
+                }
+                
+                contentHTML += `
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        <div class="bg-gradient-to-br from-blue-800 to-blue-700 p-6 rounded-xl shadow-lg">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h3 class="text-lg font-semibold text-blue-100">Actividades Totales</h3>
+                                    <p class="text-3xl font-bold text-white">${studentAssignments.length}</p>
+                                </div>
+                                <div class="text-4xl text-blue-200">📚</div>
+                            </div>
+                        </div>
+                        <div class="bg-gradient-to-br from-green-800 to-green-700 p-6 rounded-xl shadow-lg">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h3 class="text-lg font-semibold text-green-100">Completadas</h3>
+                                    <p class="text-3xl font-bold text-white">
+                                        ${studentAssignments.filter(a => a.submittedByUser).length}
+                                    </p>
+                                </div>
+                                <div class="text-4xl text-green-200">✅</div>
+                            </div>
+                        </div>
+                        <div class="bg-gradient-to-br from-red-800 to-red-700 p-6 rounded-xl shadow-lg">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h3 class="text-lg font-semibold text-red-100">Pendientes</h3>
+                                    <p class="text-3xl font-bold text-white">
+                                        ${studentAssignments.filter(a => !a.submittedByUser).length}
+                                    </p>
+                                </div>
+                                <div class="text-4xl text-red-200">⏰</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h3 class="text-2xl font-semibold mb-6 text-gray-200 flex items-center space-x-2">
+                        <span>📋</span>
+                        <span>Todas las Actividades</span>
+                    </h3>
+                `;
+
+                if (studentAssignments.length === 0) {
+                    contentHTML += `
+                        <div class="bg-gradient-to-r from-gray-800 to-gray-700 p-12 rounded-xl text-center border border-gray-600 mb-8">
+                            <div class="text-6xl mb-4">📚</div>
+                            <h4 class="text-xl font-semibold text-gray-300 mb-2">No hay actividades disponibles</h4>
+                            <p class="text-gray-400">Las actividades asignadas por tus profesores aparecerán aquí.</p>
+                        </div>
+                    `;
+                } else {
+                    contentHTML += `<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">`;
+                    studentAssignments.forEach(assignment => {
+                        const dueDate = new Date(assignment.dueDate.seconds * 1000);
+                        const today = new Date();
+                        const isOverdue = dueDate < today && !assignment.submittedByUser;
+                        const isSubmitted = assignment.submittedByUser;
+                        
+                        contentHTML += `
+                            <div class="p-6 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 border transform hover:scale-105 ${
+                                isSubmitted ? 'bg-gradient-to-br from-green-800 to-green-700 border-green-500' :
+                                isOverdue ? 'bg-gradient-to-br from-red-800 to-red-700 border-red-500' :
+                                'bg-gradient-to-br from-gray-800 to-gray-700 border-gray-600 hover:border-gray-500'
+                            }">
+                                <div class="flex justify-between items-start mb-3">
+                                    <h4 class="text-xl font-semibold text-white line-clamp-2">${assignment.title}</h4>
+                                    <div class="text-2xl">
+                                        ${isSubmitted ? '✅' : isOverdue ? '⚠️' : '📝'}
+                                    </div>
+                                </div>
+                                <p class="text-gray-300 mb-4 text-sm line-clamp-3 leading-relaxed">${assignment.description}</p>
+                                <div class="space-y-2 mb-4">
+                                    <div class="flex items-center space-x-2 text-xs">
+                                        <span>📅</span>
+                                        <span class="${isOverdue && !isSubmitted ? 'text-red-300' : 'text-gray-400'}">
+                                            Vence: ${formatDate(assignment.dueDate)}
+                                        </span>
+                                    </div>
+                                    ${assignment.fileUrl ? `
+                                    <div class="flex items-center space-x-2 text-xs">
+                                        <span class="text-blue-400">📎</span>
+                                        <a href="${assignment.fileUrl}" target="_blank" rel="noopener noreferrer" class="text-blue-400 hover:underline">Material disponible</a>
+                                    </div>` : ''}
+                                    <div class="flex items-center space-x-2 text-xs">
+                                        <span>👨‍🏫</span>
+                                        <span class="text-gray-400">Prof. ${assignment.teacherName || 'Profesor'}</span>
+                                    </div>
+                                    ${isSubmitted ? `
+                                    <div class="flex items-center space-x-2 text-xs">
+                                        <span class="text-green-400">✅</span>
+                                        <span class="text-green-400 font-medium">Entregado</span>
+                                    </div>` : ''}
+                                    ${isOverdue && !isSubmitted ? `
+                                    <div class="flex items-center space-x-2 text-xs">
+                                        <span class="text-red-400">⚠️</span>
+                                        <span class="text-red-400 font-medium">Vencido</span>
+                                    </div>` : ''}
+                                </div>
+                                <div class="space-y-2">
+                                    <button data-assignment-id="${assignment.id}" data-action="view-assignment-details" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg text-sm font-medium transition-colors flex items-center justify-center space-x-2">
+                                        <span>👁️</span>
+                                        <span>Ver Detalles</span>
+                                    </button>
+                                    ${!isSubmitted ? `
+                                    <button data-assignment-id="${assignment.id}" data-action="submit-assignment" class="w-full py-2 px-4 rounded-lg text-sm font-medium transition-colors flex items-center justify-center space-x-2 ${
+                                        isOverdue ? 'bg-orange-500 hover:bg-orange-600 text-white' : 'bg-green-500 hover:bg-green-600 text-white'
+                                    }">
+                                        <span>📤</span>
+                                        <span>${isOverdue ? 'Entregar Tarde' : 'Entregar'}</span>
+                                    </button>` : ''}
+                                </div>
+                            </div>
+                        `;
+                    });
+                    contentHTML += `</div>`;
+                }
+
+                // Sección de Quizzes para Estudiantes (NUEVA)
+                contentHTML += `
+                    <h3 class="text-2xl font-semibold mb-6 text-gray-200 flex items-center space-x-2 mt-10">
+                        <span>🧠</span>
+                        <span>Todos los Quizzes</span>
+                    </h3>
+                `;
+                if (studentQuizzes.length === 0) {
+                    contentHTML += `
+                        <div class="bg-gradient-to-r from-gray-800 to-gray-700 p-12 rounded-xl text-center border border-gray-600">
+                            <div class="text-6xl mb-4">❓</div>
+                            <h4 class="text-xl font-semibold text-gray-300 mb-2">No hay quizzes disponibles</h4>
+                            <p class="text-gray-400">Los quizzes asignados por tus profesores aparecerán aquí.</p>
+                        </div>
+                    `;
+                } else {
+                    contentHTML += `<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">`;
+                    studentQuizzes.forEach(quiz => {
+                        const dueDate = new Date(quiz.dueDate.seconds * 1000);
+                        const today = new Date();
+                        const isOverdue = dueDate < today && !quiz.submittedByUser;
+                        const isSubmitted = quiz.submittedByUser;
+
+                        contentHTML += `
+                            <div class="p-6 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 border transform hover:scale-105 ${
+                                isSubmitted ? 'bg-gradient-to-br from-green-800 to-green-700 border-green-500' :
+                                isOverdue ? 'bg-gradient-to-br from-red-800 to-red-700 border-red-500' :
+                                'bg-gradient-to-br from-gray-800 to-gray-700 border-gray-600 hover:border-gray-500'
+                            }">
+                                <div class="flex justify-between items-start mb-3">
+                                    <h4 class="text-xl font-semibold text-white line-clamp-2">${quiz.title}</h4>
+                                    <div class="text-2xl">
+                                        ${isSubmitted ? '✅' : isOverdue ? '⚠️' : '❓'}
+                                    </div>
+                                </div>
+                                <p class="text-gray-300 mb-4 text-sm line-clamp-3 leading-relaxed">${quiz.description}</p>
+                                <div class="space-y-2 mb-4">
+                                    <div class="flex items-center space-x-2 text-xs">
+                                        <span>📅</span>
+                                        <span class="${isOverdue && !isSubmitted ? 'text-red-300' : 'text-gray-400'}">
+                                            Vence: ${formatDate(quiz.dueDate)}
+                                        </span>
+                                    </div>
+                                    <div class="flex items-center space-x-2 text-xs">
+                                        <span>👨‍🏫</span>
+                                        <span class="text-gray-400">Prof. ${quiz.teacherName || 'Profesor'}</span>
+                                    </div>
+                                    <div class="flex items-center space-x-2 text-xs">
+                                        <span>❓</span>
+                                        <span class="text-gray-400">Preguntas: ${quiz.questions ? quiz.questions.length : 0}</span>
+                                    </div>
+                                    ${isSubmitted ? `
+                                    <div class="flex items-center space-x-2 text-xs">
+                                        <span class="text-green-400">✅</span>
+                                        <span class="text-green-400 font-medium">Resuelto (${quiz.score}/${quiz.totalQuestions || quiz.questions.length})</span>
+                                    </div>` : ''}
+                                    ${isOverdue && !isSubmitted ? `
+                                    <div class="flex items-center space-x-2 text-xs">
+                                        <span class="text-red-400">⚠️</span>
+                                        <span class="text-red-400 font-medium">Vencido</span>
+                                    </div>` : ''}
+                                </div>
+                                <div class="space-y-2">
+                                    ${!isSubmitted && !isOverdue ? `
+                                    <button data-quiz-id="${quiz.id}" data-action="solve-quiz" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg text-sm font-medium transition-colors flex items-center justify-center space-x-2">
+                                        <span>▶️</span>
+                                        <span>Resolver Quiz</span>
+                                    </button>` : `
+                                    <button data-quiz-id="${quiz.id}" data-action="view-quiz-results-student" class="w-full bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded-lg text-sm font-medium transition-colors flex items-center justify-center space-x-2">
+                                        <span>👁️</span>
+                                        <span>${isSubmitted ? 'Ver Resultados' : 'Ver Detalles'}</span>
+                                    </button>`}
+                                </div>
+                            </div>
+                        `;
+                    });
+                    contentHTML += `</div>`;
+                }
+
+                roleSpecificContent.innerHTML = contentHTML;
+
+                // Añadir listeners a los botones de acción de las actividades (estudiante)
+                roleSpecificContent.querySelectorAll('[data-action="submit-assignment"]').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const assignmentId = e.target.closest('[data-assignment-id]').dataset.assignmentId;
+                        const assignment = studentAssignments.find(a => a.id === assignmentId);
+                        if (assignment) showSubmitAssignmentView(assignment);
+                    });
+                });
+                roleSpecificContent.querySelectorAll('[data-action="view-assignment-details"]').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const assignmentId = e.target.closest('[data-assignment-id]').dataset.assignmentId;
+                        const assignment = studentAssignments.find(a => a.id === assignmentId);
+                        if (assignment) showSubmitAssignmentView(assignment, true); // Pasar true para modo solo-ver
+                    });
+                });
+
+                // Añadir listeners a los botones de acción de los quizzes (estudiante)
+                roleSpecificContent.querySelectorAll('[data-action="solve-quiz"]').forEach(button => {
+                    button.addEventListener('click', async (e) => {
+                        const quizId = e.target.closest('[data-quiz-id]').dataset.quizId;
+                        const quiz = studentQuizzes.find(q => q.id === quizId);
+                        if (quiz) showSolveQuizView(quiz);
+                    });
+                });
+                roleSpecificContent.querySelectorAll('[data-action="view-quiz-results-student"]').forEach(button => {
+                    button.addEventListener('click', async (e) => {
+                        const quizId = e.target.closest('[data-quiz-id]').dataset.quizId;
+                        // For now, just show quiz details, not actual results/answers
+                        const quiz = studentQuizzes.find(q => q.id === quizId);
+                        if (quiz) showSolveQuizView(quiz, true); // True for view-only mode
+                    });
+                });
+            }
+        }
+
+        async function showCreateAssignmentView() {
+            if (currentUserRole !== 'teacher') return;
+            showView('create-assignment-view');
+            // Limpiar formulario
+            createAssignmentForm.reset();
+            assignmentDueDateInput.min = new Date().toISOString().slice(0, 16);
+            fileToUploadForAssignment = null;
+            createAssignmentSelectedFileDisplay.innerHTML = '';
+            hideError(createAssignmentFileError);
+        }
+
+        async function createAssignment(assignmentData, file) {
+            setLoadingState(submitCreateAssignmentBtn, createAssignmentButtonText, createAssignmentSpinner, true);
+            hideError(createAssignmentFileError);
+
+            try {
+                let fileUrl = null;
+                let fileName = null;
+                
+                // Upload file if provided
+                if (file) {
+                    const fileRef = storage.ref().child(`assignments/${currentUser.uid}/${Date.now()}_${file.name}`);
+                    await fileRef.put(file);
+                    fileUrl = await fileRef.getDownloadURL();
+                    fileName = file.name;
+                }
+                
+                // Create assignment document
+                const assignment = {
+                    ...assignmentData,
+                    teacherId: currentUser.uid,
+                    teacherName: currentUser.displayName || currentUser.email,
+                    fileUrl,
+                    fileName,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    dueDate: firebase.firestore.Timestamp.fromDate(new Date(assignmentData.dueDate))
+                };
+                
+                await db.collection('assignments').add(assignment);
+                addNotification('success', 'Actividad creada', 'La actividad ha sido creada exitosamente');
+                renderDashboard('teacher'); // Refrescar el dashboard
+                showView('dashboard-view');
+            } catch (error) {
+                console.error("Error creating assignment:", error);
+                addNotification('error', 'Error', 'Error al crear la actividad');
+                displayError(createAssignmentFileError, 'Error al subir archivo o crear actividad.');
+            } finally {
+                setLoadingState(submitCreateAssignmentBtn, createAssignmentButtonText, createAssignmentSpinner, false);
+            }
+        }
+
+        async function showSubmitAssignmentView(assignment, isViewMode = false) {
+            currentAssignmentData = assignment; // Guardar la actividad actual
+            showView('submit-assignment-view');
+
+            submitAssignmentTitleSpan.textContent = assignment.title;
+            submitAssignmentDescriptionP.textContent = assignment.description;
+            submissionTextInput.value = ''; // Limpiar campo de texto
+            fileToUploadForSubmission = null; // Limpiar archivo seleccionado
+            submissionSelectedFileDisplay.innerHTML = '';
+            hideError(submissionFileError);
+
+            // Mostrar material adjunto si existe
+            if (assignment.fileUrl) {
+                submitAssignmentMaterialDiv.innerHTML = `
+                    <div class="bg-gray-700 p-4 rounded-lg border border-gray-600 mb-4">
+                        <p class="text-sm font-semibold text-gray-300 mb-2">Material de Apoyo:</p>
+                        <a href="${assignment.fileUrl}" target="_blank" rel="noopener noreferrer" class="text-blue-400 hover:underline flex items-center space-x-2">
+                            <span>📎</span>
+                            <span>${assignment.fileName || 'Descargar archivo'}</span>
+                        </a>
+                    </div>
+                `;
+            } else {
+                submitAssignmentMaterialDiv.innerHTML = '';
+            }
+
+            // Si es modo solo ver, deshabilitar formulario de entrega
+            if (isViewMode || assignment.submittedByUser) {
+                submissionTextInput.disabled = true;
+                submissionFileInput.disabled = true;
+                submissionDropzone.classList.add('opacity-50', 'cursor-not-allowed');
+                submitSubmissionBtn.disabled = true;
+                submitSubmissionBtn.textContent = 'Actividad Ya Entregada / Solo Ver';
+                submitSubmissionBtn.classList.remove('bg-green-500', 'hover:bg-green-600');
+                submitSubmissionBtn.classList.add('bg-gray-600', 'disabled:bg-gray-700');
+            } else {
+                submissionTextInput.disabled = false;
+                submissionFileInput.disabled = false;
+                submissionDropzone.classList.remove('opacity-50', 'cursor-not-allowed');
+                submitSubmissionBtn.disabled = false;
+                submitSubmissionBtn.textContent = 'Entregar Actividad';
+                submitSubmissionBtn.classList.add('bg-green-500', 'hover:bg-green-600');
+                submitSubmissionBtn.classList.remove('bg-gray-600', 'disabled:bg-gray-700');
+            }
+        }
+
+        async function submitAssignment(assignmentId, submissionText, file) {
+            setLoadingState(submitSubmissionBtn, submitSubmissionButtonText, submitSubmissionSpinner, true);
+            hideError(submissionFileError);
+
+            try {
+                let fileUrl = null;
+                let fileName = null;
+                
+                if (file) {
+                    const fileRef = storage.ref().child(`submissions/${assignmentId}/${currentUser.uid}_${Date.now()}_${file.name}`);
+                    await fileRef.put(file);
+                    fileUrl = await fileRef.getDownloadURL();
+                    fileName = file.name;
+                }
+
+                await db.collection('submissions').add({
+                    assignmentId,
+                    studentId: currentUser.uid,
+                    studentName: currentUser.displayName || currentUser.email,
+                    submissionText,
+                    fileUrl,
+                    fileName,
+                    submittedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    graded: false,
+                    grade: null,
+                    feedback: null
+                });
+                addNotification('success', 'Actividad entregada', 'Tu actividad ha sido entregada exitosamente.');
+                renderDashboard('student'); // Refrescar el dashboard del estudiante
+                showView('dashboard-view');
+            } catch (error) {
+                console.error("Error submitting assignment:", error);
+                addNotification('error', 'Error', 'Error al entregar la actividad.');
+                displayError(submissionFileError, 'Error al subir archivo o entregar actividad.');
+            } finally {
+                setLoadingState(submitSubmissionBtn, submitSubmissionButtonText, submitSubmissionSpinner, false);
+            }
+        }
+
+        // --- Funciones de Quiz ---
+        function showCreateQuizView() {
+            if (currentUserRole !== 'teacher') return;
+            showView('create-quiz-view');
+            createQuizForm.reset();
+            quizDueDateInput.min = new Date().toISOString().slice(0, 16);
+            currentQuestions = []; // Resetear preguntas
+            renderQuestions(); // Renderizar preguntas vacías
+        }
+
+        function renderQuestions() {
+            questionsContainer.innerHTML = '';
+            const messageElement = document.getElementById('no-questions-message'); // Get message element directly
+            if (currentQuestions.length === 0) {
+                if (messageElement) messageElement.classList.remove('hidden');
+            } else {
+                if (messageElement) messageElement.classList.add('hidden');
+                currentQuestions.forEach((q, qIndex) => {
+                    const questionDiv = document.createElement('div');
+                    questionDiv.className = 'border border-gray-600 p-4 rounded-lg bg-gray-700 bg-opacity-50 space-y-3 relative';
+                    questionDiv.innerHTML = `
+                        <button type="button" class="absolute top-2 right-2 text-red-400 hover:text-red-600 font-bold text-lg" data-action="remove-question" data-index="${qIndex}">×</button>
+                        <div>
+                            <label class="block text-gray-400 text-sm font-bold mb-2">Pregunta ${qIndex + 1} *</label>
+                            <input type="text" class="w-full py-2 px-3 bg-gray-600 border border-gray-500 rounded-lg text-gray-200 focus:outline-none focus:ring-1 focus:ring-red-500" placeholder="Escribe tu pregunta aquí..." value="${q.questionText || ''}" data-question-field="questionText" data-index="${qIndex}" required>
+                        </div>
+                        <div class="space-y-2" data-options-container data-index="${qIndex}">
+                            <label class="block text-gray-400 text-sm font-bold mb-2">Opciones de Respuesta *</label>
+                            </div>
+                        <button type="button" class="mt-2 text-blue-400 hover:text-blue-500 text-sm" data-action="add-option" data-index="${qIndex}">+ Añadir Opción</button>
+                    `;
+                    questionsContainer.appendChild(questionDiv);
+
+                    // Renderizar opciones para esta pregunta
+                    const optionsContainer = questionDiv.querySelector('[data-options-container]');
+                    q.options.forEach((optionText, oIndex) => {
+                        const optionDiv = document.createElement('div');
+                        optionDiv.className = 'flex items-center space-x-2';
+                        optionDiv.innerHTML = `
+                            <input type="radio" name="correct-option-${qIndex}" id="option-${qIndex}-${oIndex}" value="${oIndex}" ${q.correctOptionIndex === oIndex ? 'checked' : ''} class="form-radio text-green-500" data-question-index="${qIndex}" data-option-index="${oIndex}" data-action="set-correct-option">
+                            <input type="text" class="flex-1 py-2 px-3 bg-gray-600 border border-gray-500 rounded-lg text-gray-200 focus:outline-none focus:ring-1 focus:ring-green-500" placeholder="Opción ${oIndex + 1}" value="${optionText}" data-option-field="optionText" data-question-index="${qIndex}" data-option-index="${oIndex}" required>
+                            <button type="button" class="text-red-400 hover:text-red-600" data-action="remove-option" data-question-index="${qIndex}" data-option-index="${oIndex}">×</button>
+                        `;
+                        optionsContainer.appendChild(optionDiv);
+                    });
+
+                    // Añadir listeners para los inputs y botones de esta pregunta/opción
+                    questionDiv.querySelector('input[data-question-field="questionText"]').addEventListener('input', (e) => {
+                        const idx = parseInt(e.target.dataset.index);
+                        currentQuestions[idx].questionText = e.target.value;
+                    });
+                    questionDiv.querySelectorAll('input[data-option-field="optionText"]').forEach(input => {
+                        input.addEventListener('input', (e) => {
+                            const qIdx = parseInt(e.target.dataset.questionIndex);
+                            const optionIdx = parseInt(e.target.dataset.optionIndex);
+                            currentQuestions[qIdx].options[optionIdx] = e.target.value;
+                        });
+                    });
+                    questionDiv.querySelectorAll('[data-action="remove-option"]').forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            const qIdx = parseInt(e.target.dataset.questionIndex);
+                            const optionIdx = parseInt(e.target.dataset.optionIndex);
+                            currentQuestions[qIdx].options.splice(optionIdx, 1);
+                            if (currentQuestions[qIdx].correctOptionIndex === optionIdx) {
+                                currentQuestions[qIdx].correctOptionIndex = -1; // Reset correct if removed
+                            } else if (currentQuestions[qIdx].correctOptionIndex > optionIdx) {
+                                currentQuestions[qIdx].correctOptionIndex--; // Adjust index if correct option was before removed one
+                            }
+                            renderQuestions();
+                        });
+                    });
+                    questionDiv.querySelector('[data-action="add-option"]').addEventListener('click', (e) => {
+                        const qIdx = parseInt(e.target.dataset.index);
+                        currentQuestions[qIdx].options.push('');
+                        renderQuestions();
+                    });
+                    questionDiv.querySelectorAll('[data-action="set-correct-option"]').forEach(radio => {
+                        radio.addEventListener('change', (e) => {
+                            const qIdx = parseInt(e.target.dataset.questionIndex);
+                            currentQuestions[qIdx].correctOptionIndex = parseInt(e.target.value);
+                        });
+                    });
+                });
+            }
+        }
+
+        addQuestionBtn.addEventListener('click', () => {
+            currentQuestions.push({ questionText: '', options: ['', '', ''], correctOptionIndex: -1 }); // Default 3 empty options
+            renderQuestions();
+        });
+
+        questionsContainer.addEventListener('click', (e) => {
+            if (e.target.dataset.action === 'remove-question') {
+                const indexToRemove = parseInt(e.target.dataset.index);
+                currentQuestions.splice(indexToRemove, 1);
+                renderQuestions();
+            }
+        });
+
+        async function createQuiz(quizData) {
+            setLoadingState(submitCreateQuizBtn, createQuizButtonText, createQuizSpinner, true);
+            // Validar preguntas
+            if (currentQuestions.length === 0) {
+                addNotification('error', 'Error de Quiz', 'Un quiz debe tener al menos una pregunta.');
+                setLoadingState(submitCreateQuizBtn, createQuizButtonText, createQuizSpinner, false);
+                return;
+            }
+            for (const q of currentQuestions) {
+                if (!q.questionText.trim()) {
+                    addNotification('error', 'Error de Quiz', `Todas las preguntas deben tener texto.`);
+                    setLoadingState(submitCreateQuizBtn, createQuizButtonText, createQuizSpinner, false);
+                    return;
+                }
+                if (q.options.length < 2) {
+                    addNotification('error', 'Error de Quiz', `La pregunta "${q.questionText.substring(0, Math.min(20, q.questionText.length))}..." debe tener al menos 2 opciones.`);
+                    setLoadingState(submitCreateQuizBtn, createQuizButtonText, createQuizSpinner, false);
+                    return;
+                }
+                for (const opt of q.options) {
+                    if (!opt.trim()) {
+                        addNotification('error', 'Error de Quiz', `Todas las opciones de la pregunta "${q.questionText.substring(0, Math.min(20, q.questionText.length))}..." deben tener texto.`);
+                        setLoadingState(submitCreateQuizBtn, createQuizButtonText, createQuizSpinner, false);
+                        return;
+                    }
+                }
+                if (q.correctOptionIndex === -1 || q.correctOptionIndex >= q.options.length) {
+                    addNotification('error', 'Error de Quiz', `La pregunta "${q.questionText.substring(0, Math.min(20, q.questionText.length))}..." debe tener una opción correcta seleccionada.`);
+                    setLoadingState(submitCreateQuizBtn, createQuizButtonText, createQuizSpinner, false);
+                    return;
+                }
+            }
+
+            try {
+                const quizToSave = {
+                    ...quizData,
+                    teacherId: currentUser.uid,
+                    teacherName: currentUser.displayName || currentUser.email,
+                    questions: currentQuestions,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    dueDate: firebase.firestore.Timestamp.fromDate(new Date(quizData.dueDate))
+                };
+                
+                await db.collection('quizzes').add(quizToSave);
+                addNotification('success', 'Quiz creado', 'El quiz ha sido creado exitosamente.');
+                renderDashboard('teacher');
+                showView('dashboard-view');
+            } catch (error) {
+                console.error("Error creating quiz:", error);
+                addNotification('error', 'Error', 'Error al crear el quiz.');
+            } finally {
+                setLoadingState(submitCreateQuizBtn, createQuizButtonText, createQuizSpinner, false);
+            }
+        }
+
+        // --- Funciones para Resolver Quiz ---
+
+        async function showSolveQuizView(quiz, isViewMode = false) {
+            currentQuizToSolve = quiz; // Store the quiz being solved
+            showView('solve-quiz-view');
+
+            solveQuizTitleSpan.textContent = quiz.title;
+            solveQuizDescriptionP.textContent = quiz.description;
+            solveQuizDueDateSpan.textContent = formatDate(quiz.dueDate);
+            quizQuestionsDisplay.innerHTML = ''; // Clear previous questions
+            solveQuizForm.reset(); // Reset form for new selections
+
+            quiz.questions.forEach((q, qIndex) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'bg-gray-700 p-5 rounded-lg border border-gray-600 space-y-3';
+                questionDiv.innerHTML = `
+                    <p class="font-semibold text-lg text-gray-200">Pregunta ${qIndex + 1}: ${q.questionText}</p>
+                    <div class="space-y-2">
+                        ${q.options.map((option, oIndex) => `
+                            <label class="flex items-center space-x-3 cursor-pointer p-2 rounded-md hover:bg-gray-600 transition-colors">
+                                <input type="radio" name="question-${qIndex}" value="${oIndex}" class="form-radio text-blue-500" data-question-index="${qIndex}" ${isViewMode || quiz.submittedByUser ? 'disabled' : ''}>
+                                <span class="text-gray-300">${option}</span>
+                            </label>
+                        `).join('')}
+                    </div>
+                `;
+                quizQuestionsDisplay.appendChild(questionDiv);
+            });
+
+            // If in view mode, disable submit button
+            if (isViewMode || quiz.submittedByUser) {
+                submitSolveQuizBtn.disabled = true;
+                submitSolveQuizBtn.textContent = isViewMode ? 'Quiz en modo solo lectura' : 'Quiz Ya Resuelto';
+                submitSolveQuizBtn.classList.remove('bg-green-500', 'hover:bg-green-600');
+                submitSolveQuizBtn.classList.add('bg-gray-600', 'disabled:bg-gray-700');
+            } else {
+                submitSolveQuizBtn.disabled = false;
+                submitSolveQuizBtn.textContent = 'Terminar Quiz';
+                submitSolveQuizBtn.classList.add('bg-green-500', 'hover:bg-green-600');
+                submitSolveQuizBtn.classList.remove('bg-gray-600', 'disabled:bg-gray-700');
+            }
+        }
+
+        solveQuizForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!currentQuizToSolve) {
+                addNotification('error', 'Error', 'No hay quiz seleccionado para resolver.');
+                return;
+            }
+
+            setLoadingState(submitSolveQuizBtn, solveQuizButtonText, solveQuizSpinner, true);
+
+            const studentAnswers = [];
+            let score = 0;
+            let allAnswered = true;
+
+            currentQuizToSolve.questions.forEach((q, qIndex) => {
+                const selectedOptionRadio = solveQuizForm.querySelector(`input[name="question-${qIndex}"]:checked`);
+                if (selectedOptionRadio) {
+                    const selectedOptionIndex = parseInt(selectedOptionRadio.value);
+                    studentAnswers.push({
+                        questionIndex: qIndex,
+                        selectedOptionIndex: selectedOptionIndex
+                    });
+                    // Check if correct
+                    if (q.correctOptionIndex === selectedOptionIndex) {
+                        score++;
+                    }
+                } else {
+                    allAnswered = false; // Mark if any question is not answered
+                }
+            });
+
+            if (!allAnswered) {
+                addNotification('warning', 'Advertencia', 'Por favor, responde todas las preguntas del quiz.');
+                setLoadingState(submitSolveQuizBtn, solveQuizButtonText, solveQuizSpinner, false);
+                return;
+            }
+
+            try {
+                await db.collection('quiz_submissions').add({
+                    quizId: currentQuizToSolve.id,
+                    studentId: currentUser.uid,
+                    studentName: currentUser.displayName || currentUser.email,
+                    submittedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    answers: studentAnswers,
+                    score: score,
+                    totalQuestions: currentQuizToSolve.questions.length
+                });
+                addNotification('success', 'Quiz Terminado', `Has completado el quiz "${currentQuizToSolve.title}" con una puntuación de ${score}/${currentQuizToSolve.questions.length}.`);
+                renderDashboard('student'); // Refresh student dashboard
+                showView('dashboard-view');
+            } catch (error) {
+                console.error("Error submitting quiz:", error);
+                addNotification('error', 'Error', 'Error al enviar el quiz.');
+            } finally {
+                setLoadingState(submitSolveQuizBtn, solveQuizButtonText, solveQuizSpinner, false);
+            }
+        });
+
+        cancelSolveQuizBtn.addEventListener('click', () => {
+            if (currentUserRole === 'student') {
+                renderDashboard('student');
+                showView('dashboard-view');
+            } else {
+                showView('dashboard-view');
+            }
+        });
+
+        // --- Funciones de Entregas de Actividades ---
+
+        async function showAssignmentSubmissionsView(assignmentId) {
+            currentAssignmentToViewSubmissions = assignmentId; // Store the ID of the assignment
+            showView('view-assignment-submissions-view');
+
+            const assignmentDoc = await db.collection('assignments').doc(assignmentId).get();
+            if (assignmentDoc.exists) {
+                const assignmentData = assignmentDoc.data();
+                submissionsAssignmentTitleSpan.textContent = assignmentData.title;
+            } else {
+                submissionsAssignmentTitleSpan.textContent = "Actividad no encontrada";
+                addNotification('error', 'Error', 'Actividad no encontrada.');
+                return;
+            }
+
+            assignmentSubmissionsList.innerHTML = ''; // Clear previous list
+            noSubmissionsMessage.classList.add('hidden'); // Hide default message
+
+            try {
+                const submissionsQuery = db.collection('submissions')
+                    .where('assignmentId', '==', assignmentId)
+                    .orderBy('submittedAt', 'desc');
+                const querySnapshot = await submissionsQuery.get();
+
+                if (querySnapshot.empty) {
+                    noSubmissionsMessage.classList.remove('hidden');
+                } else {
+                    querySnapshot.forEach(doc => {
+                        const submission = doc.data();
+                        const submissionItem = document.createElement('div');
+                        submissionItem.className = 'bg-gray-700 p-4 rounded-lg shadow-md border border-gray-600 mb-4'; // Added mb-4 for spacing
+                        submissionItem.innerHTML = `
+                            <div class="flex justify-between items-center mb-2">
+                                <h4 class="text-lg font-semibold text-gray-200">${submission.studentName || 'Estudiante Desconocido'}</h4>
+                                <span class="text-sm text-gray-400">Entregado: ${formatDate(submission.submittedAt)}</span>
+                            </div>
+                            ${submission.submissionText ? `
+                            <p class="text-gray-300 text-sm mb-2">Respuesta: <span class="italic">${submission.submissionText}</span></p>` : ''}
+                            ${submission.fileUrl ? `
+                            <div class="flex items-center space-x-2 text-blue-400 text-sm">
+                                <span>📎</span>
+                                <a href="${submission.fileUrl}" target="_blank" rel="noopener noreferrer" class="hover:underline">Descargar archivo: ${submission.fileName || 'archivo'}</a>
+                            </div>` : ''}
+                            `;
+                        assignmentSubmissionsList.appendChild(submissionItem);
+                    });
+                }
+            } catch (error) {
+                console.error("Error fetching submissions:", error);
+                addNotification('error', 'Error', 'Error al cargar las entregas de la actividad.');
+                noSubmissionsMessage.textContent = "Error al cargar las entregas.";
+                noSubmissionsMessage.classList.remove('hidden');
+            }
+        }
+
+        // --- Funciones de Resultados de Quiz ---
+
+        async function showQuizResultsView(quizId) {
+            currentQuizToViewResults = quizId;
+            showView('view-quiz-results-view');
+
+            const quizDoc = await db.collection('quizzes').doc(quizId).get();
+            if (quizDoc.exists) {
+                const quizData = quizDoc.data();
+                resultsQuizTitleSpan.textContent = quizData.title;
+            } else {
+                resultsQuizTitleSpan.textContent = "Quiz no encontrado";
+                addNotification('error', 'Error', 'Quiz no encontrado.');
+                return;
+            }
+
+            quizResultsList.innerHTML = ''; // Clear previous list
+            noQuizResultsMessage.classList.add('hidden'); // Hide default message
+
+            try {
+                const quizSubmissionsQuery = db.collection('quiz_submissions')
+                    .where('quizId', '==', quizId)
+                    .orderBy('submittedAt', 'desc');
+                const querySnapshot = await quizSubmissionsQuery.get();
+
+                if (querySnapshot.empty) {
+                    noQuizResultsMessage.classList.remove('hidden');
+                } else {
+                    querySnapshot.forEach(doc => {
+                        const submission = doc.data();
+                        const submissionItem = document.createElement('div');
+                        submissionItem.className = 'bg-gray-700 p-4 rounded-lg shadow-md border border-gray-600 mb-4';
+                        submissionItem.innerHTML = `
+                            <div class="flex justify-between items-center mb-2">
+                                <h4 class="text-lg font-semibold text-gray-200">${submission.studentName || 'Estudiante Desconocido'}</h4>
+                                <span class="text-sm text-gray-400">Entregado: ${formatDate(submission.submittedAt)}</span>
+                            </div>
+                            <p class="text-gray-300 text-sm mb-2">Puntuación: <span class="font-bold text-green-400">${submission.score}</span> / ${submission.totalQuestions}</p>
+                            `;
+                        quizResultsList.appendChild(submissionItem);
+                    });
+                }
+            } catch (error) {
+                console.error("Error fetching quiz results:", error);
+                addNotification('error', 'Error', 'Error al cargar los resultados del quiz.');
+                noQuizResultsMessage.textContent = "Error al cargar los resultados.";
+                noQuizResultsMessage.classList.remove('hidden');
+            }
+        }
+
+        // --- Event Listeners Globales ---
+        navBrand.addEventListener('click', () => {
+            if (currentUser && currentUserRole) {
+                renderDashboard(currentUserRole);
+                showView('dashboard-view');
+            } else {
+                showView('login-view');
+            }
+        });
+
+        // Desktop Nav Buttons
+        navDashboardBtnDesktop.addEventListener('click', () => {
+            if (currentUser && currentUserRole) {
+                renderDashboard(currentUserRole);
+                showView('dashboard-view');
+            }
+        });
+        navCreateAssignmentBtnDesktop.addEventListener('click', () => showCreateAssignmentView());
+        navCreateQuizBtnDesktop.addEventListener('click', () => showCreateQuizView());
+        navLoginBtnDesktop.addEventListener('click', () => showView('login-view'));
+        navRegisterBtnDesktop.addEventListener('click', () => showView('register-view'));
+
+        // Mobile Nav Buttons
+        navDashboardBtnMobile.addEventListener('click', () => {
+            if (currentUser && currentUserRole) {
+                renderDashboard(currentUserRole);
+                showView('dashboard-view');
+            }
+        });
+        navCreateAssignmentBtnMobile.addEventListener('click', () => showCreateAssignmentView());
+        navCreateQuizBtnMobile.addEventListener('click', () => showCreateQuizView());
+        navLoginBtnMobile.addEventListener('click', () => showView('login-view'));
+        navRegisterBtnMobile.addEventListener('click', () => showView('register-view'));
+
+        // Menu Toggle for Mobile
+        menuToggle.addEventListener('click', () => {
+            mobileMenu.classList.toggle('active');
+        });
+
+
+        // Event listeners para la carga de archivos en "Crear Actividad"
+        createAssignmentDropzone.addEventListener('dragover', (e) => { e.preventDefault(); createAssignmentDropzone.classList.add('border-red-500', 'bg-red-50', 'bg-opacity-10', 'transform', 'scale-105'); });
+        createAssignmentDropzone.addEventListener('dragleave', () => { createAssignmentDropzone.classList.remove('border-red-500', 'bg-red-50', 'bg-opacity-10', 'transform', 'scale-105'); });
+        createAssignmentDropzone.addEventListener('drop', (e) => handleFileSelection(e, createAssignmentFileInput, createAssignmentDropzone, createAssignmentFileError, createAssignmentSelectedFileDisplay, (file) => fileToUploadForAssignment = file, ".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png", 10));
+        createAssignmentFileInput.addEventListener('change', (e) => handleFileSelection(e, createAssignmentFileInput, createAssignmentDropzone, createAssignmentFileError, createAssignmentSelectedFileDisplay, (file) => fileToUploadForAssignment = file, ".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png", 10));
+
+        // Event listener para el botón de cancelar en "Crear Actividad"
+        cancelCreateAssignmentBtn.addEventListener('click', () => {
+            if (currentUserRole === 'teacher') {
+                renderDashboard('teacher');
+                showView('dashboard-view');
+            } else {
+                showView('dashboard-view');
+            }
+        });
+
+        // Event listener para el formulario de "Crear Actividad"
+        createAssignmentForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const title = assignmentTitleInput.value;
+            const description = assignmentDescriptionTextarea.value;
+            const dueDate = assignmentDueDateInput.value;
+
+            if (!title || !description || !dueDate) {
+                addNotification('error', 'Campos requeridos', 'Por favor, completa todos los campos obligatorios.');
+                return;
+            }
+
+            const assignmentData = { title, description, dueDate };
+            await createAssignment(assignmentData, fileToUploadForAssignment);
+        });
+
+        // Event listeners para la carga de archivos en "Entregar Actividad"
+        submissionDropzone.addEventListener('dragover', (e) => { e.preventDefault(); submissionDropzone.classList.add('border-red-500', 'bg-red-50', 'bg-opacity-10', 'transform', 'scale-105'); });
+        submissionDropzone.addEventListener('dragleave', () => { submissionDropzone.classList.remove('border-red-500', 'bg-red-50', 'bg-opacity-10', 'transform', 'scale-105'); });
+        submissionDropzone.addEventListener('drop', (e) => handleFileSelection(e, submissionFileInput, submissionDropzone, submissionFileError, submissionSelectedFileDisplay, (file) => fileToUploadForSubmission = file, ".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png", 10));
+        submissionFileInput.addEventListener('change', (e) => handleFileSelection(e, submissionFileInput, submissionDropzone, submissionFileError, submissionSelectedFileDisplay, (file) => fileToUploadForSubmission = file, ".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png", 10));
+
+        // Event listener para el botón de cancelar en "Entregar Actividad"
+        cancelSubmitAssignmentBtn.addEventListener('click', () => {
+            if (currentUserRole === 'student') {
+                renderDashboard('student');
+                showView('dashboard-view');
+            } else {
+                showView('dashboard-view');
+            }
+        });
+
+        // Event listener para el formulario de "Entregar Actividad"
+        submitAssignmentForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!currentAssignmentData) {
+                addNotification('error', 'Error', 'No hay actividad seleccionada para entregar.');
+                return;
+            }
+
+            const submissionText = submissionTextInput.value;
+            if (!submissionText && !fileToUploadForSubmission) {
+                addNotification('warning', 'Advertencia', 'Por favor, introduce tu respuesta o sube un archivo.');
+                return;
+            }
+
+            await submitAssignment(currentAssignmentData.id, submissionText, fileToUploadForSubmission);
+        });
+
+        // Event listeners para la creación de Quiz
+        cancelCreateQuizBtn.addEventListener('click', () => {
+            if (currentUserRole === 'teacher') {
+                renderDashboard('teacher');
+                showView('dashboard-view');
+            } else {
+                showView('dashboard-view');
+            }
+        });
+
+        createQuizForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const title = quizTitleInput.value;
+            const description = quizDescriptionTextarea.value;
+            const dueDate = quizDueDateInput.value;
+
+            if (!title || !description || !dueDate) {
+                addNotification('error', 'Campos requeridos', 'Por favor, completa todos los campos obligatorios del quiz.');
+                return;
+            }
+
+            const quizData = { title, description, dueDate };
+            await createQuiz(quizData);
+        });
+
+        // Event listeners para Resolver Quiz
+        cancelSolveQuizBtn.addEventListener('click', () => {
+            if (currentUserRole === 'student') {
+                renderDashboard('student');
+                showView('dashboard-view');
+            } else {
+                showView('dashboard-view');
+            }
+        });
+
+        // Event listener para el botón "Volver al Dashboard" en la vista de entregas de actividades
+        backToTeacherDashboardFromSubmissionsBtn.addEventListener('click', () => {
+            renderDashboard('teacher');
+            showView('dashboard-view');
+        });
+
+        // Event listener para el botón "Volver al Dashboard" en la vista de resultados de quiz
+        backToTeacherDashboardFromQuizResultsBtn.addEventListener('click', () => {
+            renderDashboard('teacher');
+            showView('dashboard-view');
+        });
+
+        // Iniciar la aplicación mostrando la pantalla de carga
+        loadingScreen.classList.remove('hidden');
+    </script>
+</body>
+</html>
