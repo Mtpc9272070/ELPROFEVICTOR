@@ -368,28 +368,6 @@
                                 class="w-full py-3 px-4 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
                             />
                         </div>
-                        <div id="create-assignment-file-upload-container">
-                            <label class="block text-gray-400 text-sm font-bold mb-2">Material de Apoyo (Opcional)</label>
-                            <div id="create-assignment-dropzone" class="relative border-2 border-dashed rounded-lg p-6 text-center transition-all duration-200 border-gray-600 hover:border-gray-500">
-                                <div class="space-y-3">
-                                    <div class="text-gray-400">
-                                        <svg class="mx-auto h-12 w-12" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-                                            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                        </svg>
-                                    </div>
-                                    <div class="text-sm text-gray-300">
-                                        <span class="font-medium text-red-400 cursor-pointer">Haz clic para subir</span> o arrastra y suelta
-                                    </div>
-                                    <div class="text-xs text-gray-500">
-                                        .pdf,.doc,.docx,.txt,.jpg,.jpeg,.png hasta 10MB
-                                    </div>
-                                </div>
-                                <input type="file" id="create-assignment-file-input" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png">
-                            </div>
-                            <p id="create-assignment-file-error" class="text-red-400 text-sm mt-2 bg-red-900 bg-opacity-30 p-2 rounded hidden"></p>
-                            <div id="create-assignment-selected-file-display" class="mt-4"></div>
-                        </div>
-
                         <div class="flex space-x-4 pt-4">
                             <button
                                 type="button"
@@ -427,36 +405,29 @@
 
                     <form id="submit-assignment-form" class="space-y-6">
                         <div>
-                            <label for="submission-text" class="block text-gray-400 text-sm font-bold mb-2">Tu Respuesta (Opcional)</label>
-                            <textarea
-                                id="submission-text"
-                                placeholder="Escribe tu respuesta aquí..."
-                                rows="6"
-                                class="w-full py-3 px-4 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all resize-none"
-                            ></textarea>
+                            <label for="submission-work-title" class="block text-gray-400 text-sm font-bold mb-2">Título del Trabajo *</label>
+                            <input
+                                type="text"
+                                id="submission-work-title"
+                                placeholder="Ej: Mi ensayo sobre Don Quijote"
+                                required
+                                class="w-full py-3 px-4 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+                            />
                         </div>
-                        <div id="submission-file-upload-container">
-                            <label class="block text-gray-400 text-sm font-bold mb-2">Subir Archivo de Entrega (Opcional)</label>
-                            <div id="submission-dropzone" class="relative border-2 border-dashed rounded-lg p-6 text-center transition-all duration-200 border-gray-600 hover:border-gray-500">
-                                <div class="space-y-3">
-                                    <div class="text-gray-400">
-                                        <svg class="mx-auto h-12 w-12" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-                                            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                        </svg>
-                                    </div>
-                                    <div class="text-sm text-gray-300">
-                                        <span class="font-medium text-red-400 cursor-pointer">Haz clic para subir</span> o arrastra y suelta
-                                    </div>
-                                    <div class="text-xs text-gray-500">
-                                        .pdf,.doc,.docx,.txt,.jpg,.jpeg,.png hasta 10MB
-                                    </div>
-                                </div>
-                                <input type="file" id="submission-file-input" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png">
-                            </div>
-                            <p id="submission-file-error" class="text-red-400 text-sm mt-2 bg-red-900 bg-opacity-30 p-2 rounded hidden"></p>
-                            <div id="submission-selected-file-display" class="mt-4"></div>
+                        <div>
+                            <label for="submission-link" class="block text-gray-400 text-sm font-bold mb-2">Enlace al Trabajo *</label>
+                            <input
+                                type="url"
+                                id="submission-link"
+                                placeholder="Ej: https://docs.google.com/document/d/..."
+                                required
+                                class="w-full py-3 px-4 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all"
+                            />
+                            <p class="text-xs text-gray-500 mt-1 bg-gray-700 bg-opacity-50 p-2 rounded">
+                                Enlace a tu documento, presentación, video, etc. (ej: Google Docs, YouTube, OneDrive)
+                            </p>
                         </div>
-
+                        
                         <div class="flex space-x-4 pt-4">
                             <button
                                 type="button"
@@ -660,7 +631,7 @@
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
-        const storage = firebase.storage();
+        const storage = firebase.storage(); // Aunque no se usará directamente para subir, se mantiene la referencia por si se necesita para descargar material de apoyo original.
 
         // --- Estado Global de la Aplicación (similar a useState en React) ---
         let currentUser = null;
@@ -682,7 +653,7 @@
         const createQuizView = document.getElementById('create-quiz-view');
         const solveQuizView = document.getElementById('solve-quiz-view');
         const viewAssignmentSubmissionsView = document.getElementById('view-assignment-submissions-view');
-        const viewQuizResultsView = document.getElementById('view-quiz-results-view'); // Nueva vista
+        const viewQuizResultsView = document.getElementById('view-quiz-results-view');
 
         // Navbar Elements
         const navBrand = document.getElementById('nav-brand');
@@ -752,31 +723,28 @@
         const assignmentTitleInput = document.getElementById('assignment-title');
         const assignmentDescriptionTextarea = document.getElementById('assignment-description');
         const assignmentDueDateInput = document.getElementById('assignment-due-date');
-        const createAssignmentDropzone = document.getElementById('create-assignment-dropzone');
-        const createAssignmentFileInput = document.getElementById('create-assignment-file-input');
-        const createAssignmentFileError = document.getElementById('create-assignment-file-error');
-        const createAssignmentSelectedFileDisplay = document.getElementById('create-assignment-selected-file-display');
+        // REMOVED: const createAssignmentDropzone, createAssignmentFileInput, etc.
+        // REMOVED: const createAssignmentFileError, createAssignmentSelectedFileDisplay, etc.
         const cancelCreateAssignmentBtn = document.getElementById('cancel-create-assignment-btn');
         const submitCreateAssignmentBtn = document.getElementById('submit-create-assignment-btn');
         const createAssignmentButtonText = document.getElementById('create-assignment-button-text');
         const createAssignmentSpinner = document.getElementById('create-assignment-spinner');
-        let fileToUploadForAssignment = null; // Variable para el archivo de la actividad
+        // REMOVED: let fileToUploadForAssignment = null;
 
         // Submit Assignment Elements
         const submitAssignmentTitleSpan = document.getElementById('submit-assignment-title');
         const submitAssignmentDescriptionP = document.getElementById('submit-assignment-description');
         const submitAssignmentMaterialDiv = document.getElementById('submit-assignment-material');
         const submitAssignmentForm = document.getElementById('submit-assignment-form');
-        const submissionTextInput = document.getElementById('submission-text');
-        const submissionDropzone = document.getElementById('submission-dropzone');
-        const submissionFileInput = document.getElementById('submission-file-input');
-        const submissionFileError = document.getElementById('submission-file-error');
-        const submissionSelectedFileDisplay = document.getElementById('submission-selected-file-display');
+        const submissionWorkTitleInput = document.getElementById('submission-work-title'); // NEW
+        const submissionLinkInput = document.getElementById('submission-link'); // NEW
+        // REMOVED: const submissionTextInput, submissionDropzone, submissionFileInput, etc.
+        // REMOVED: const submissionFileError, submissionSelectedFileDisplay, etc.
         const cancelSubmitAssignmentBtn = document.getElementById('cancel-submit-assignment-btn');
         const submitSubmissionBtn = document.getElementById('submit-submission-btn');
         const submitSubmissionButtonText = document.getElementById('submit-submission-button-text');
         const submitSubmissionSpinner = document.getElementById('submit-submission-spinner');
-        let fileToUploadForSubmission = null; // Variable para el archivo de la entrega
+        // REMOVED: let fileToUploadForSubmission = null;
 
         // Create Quiz Elements
         const createQuizForm = document.getElementById('create-quiz-form');
@@ -951,104 +919,8 @@
             return date.toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
         }
         
-        // Manejo de Archivos (parte de FileUpload Component)
-        function getFileIcon(fileName) {
-            const extension = fileName.split('.').pop().toLowerCase();
-            switch (extension) {
-                case 'pdf': return '📄';
-                case 'doc': case 'docx': return '📝';
-                case 'txt': return '📃';
-                case 'jpg': case 'jpeg': return '🖼️';
-                default: return '📎';
-            }
-        }
-
-        function formatFileSize(bytes) {
-            if (bytes === 0) return '0 Bytes';
-            const k = 1024;
-            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-        }
-
-        function renderFileDisplay(containerElement, file, downloadUrl, showDelete, onDeleteCallback) {
-            containerElement.innerHTML = ''; // Limpiar cualquier archivo anterior
-            if (!file && !downloadUrl) return;
-
-            const fileDisplayDiv = document.createElement('div');
-            fileDisplayDiv.className = "flex items-center justify-between p-4 bg-gray-700 rounded-lg border border-gray-600 hover:bg-gray-650 transition-colors";
-            fileDisplayDiv.innerHTML = `
-                <div class="flex items-center space-x-3">
-                    <span class="text-2xl">${getFileIcon(file ? file.name : 'Enlace')}</span>
-                    <div>
-                        <p class="text-sm font-medium text-gray-200 truncate max-w-48">${file ? file.name : 'Archivo adjunto'}</p>
-                        <p class="text-xs text-gray-400">${file ? formatFileSize(file.size) : ''}</p>
-                    </div>
-                </div>
-                <div class="flex space-x-2">
-                    ${downloadUrl ? `
-                        <a href="${downloadUrl}" target="_blank" rel="noopener noreferrer" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm transition-colors flex items-center space-x-1">
-                            <span>⬇</span>
-                            <span>Descargar</span>
-                        </a>` : ''}
-                    ${showDelete ? `
-                        <button class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm transition-colors flex items-center space-x-1" data-action="delete-file">
-                            <span>🗑️</span>
-                            <span>Eliminar</span>
-                        </button>` : ''}
-                </div>
-            `;
-            containerElement.appendChild(fileDisplayDiv);
-
-            if (showDelete && onDeleteCallback) {
-                fileDisplayDiv.querySelector('[data-action="delete-file"]').addEventListener('click', onDeleteCallback);
-            }
-        }
-        
-        // Función genérica para manejar la selección de archivos
-        function handleFileSelection(event, fileInput, dropzone, errorElement, displayElement, fileVarSetter, acceptedTypes, maxSize) {
-            hideError(errorElement);
-            let selectedFile;
-            if (event.type === 'drop') {
-                event.preventDefault(); // Evitar comportamiento predeterminado del navegador
-                selectedFile = event.dataTransfer.files[0];
-                dropzone.classList.remove('border-red-500', 'bg-red-50', 'bg-opacity-10', 'transform', 'scale-105');
-            } else { // 'change' event from input
-                selectedFile = fileInput.files[0];
-            }
-
-            if (!selectedFile) {
-                fileVarSetter(null);
-                displayElement.innerHTML = '';
-                return;
-            }
-
-            const allowedTypes = acceptedTypes.split(',').map(type => type.trim());
-            const fileExtension = '.' + selectedFile.name.split('.').pop().toLowerCase();
-            
-            if (!allowedTypes.includes(fileExtension)) {
-                displayError(errorElement, `Tipo de archivo no permitido. Tipos aceptados: ${acceptedTypes}`);
-                fileVarSetter(null);
-                displayElement.innerHTML = '';
-                return;
-            }
-
-            if (selectedFile.size > maxSize * 1024 * 1024) {
-                displayError(errorElement, `El archivo es muy grande. Tamaño máximo: ${maxSize}MB`);
-                fileVarSetter(null);
-                displayElement.innerHTML = '';
-                return;
-            }
-
-            fileVarSetter(selectedFile);
-            renderFileDisplay(displayElement, selectedFile, null, true, () => {
-                fileVarSetter(null);
-                displayElement.innerHTML = '';
-                fileInput.value = ''; // Reset input field
-                addNotification('info', 'Archivo removido', 'El archivo ha sido eliminado de la selección.');
-            });
-            addNotification('info', 'Archivo seleccionado', `${selectedFile.name} está listo para subir`);
-        }
+        // REMOVED: Manejo de Archivos (getFileIcon, formatFileSize, renderFileDisplay, handleFileSelection)
+        // Ya no se necesitan si no se suben archivos.
 
         // --- Manejadores de Autenticación y Carga Inicial ---
 
@@ -1249,6 +1121,7 @@
                 for (const doc of querySnapshot.docs) {
                     const assignmentData = { id: doc.id, ...doc.data() };
                     
+                    // Si es estudiante, verifica si ya entregó (ahora por submissionLink o submissionTitle)
                     if (currentUserRole === 'student') {
                         const submissionQuery = db.collection('submissions')
                             .where('assignmentId', '==', doc.id)
@@ -1456,7 +1329,7 @@
                 roleSpecificContent.querySelectorAll('[data-action="view-quiz-results"]').forEach(button => {
                     button.addEventListener('click', (e) => {
                         const quizId = e.target.closest('[data-quiz-id]').dataset.quizId;
-                        showQuizResultsView(quizId); // Llama a la nueva función
+                        showQuizResultsView(quizId);
                     });
                 });
 
@@ -1768,34 +1641,24 @@
             // Limpiar formulario
             createAssignmentForm.reset();
             assignmentDueDateInput.min = new Date().toISOString().slice(0, 16);
-            fileToUploadForAssignment = null;
-            createAssignmentSelectedFileDisplay.innerHTML = '';
-            hideError(createAssignmentFileError);
+            // REMOVED: fileToUploadForAssignment = null;
+            // REMOVED: createAssignmentSelectedFileDisplay.innerHTML = '';
+            // REMOVED: hideError(createAssignmentFileError);
         }
 
-        async function createAssignment(assignmentData, file) {
+        async function createAssignment(assignmentData) { // REMOVED: file parameter
             setLoadingState(submitCreateAssignmentBtn, createAssignmentButtonText, createAssignmentSpinner, true);
-            hideError(createAssignmentFileError);
+            // REMOVED: hideError(createAssignmentFileError);
 
             try {
-                let fileUrl = null;
-                let fileName = null;
-                
-                // Upload file if provided
-                if (file) {
-                    const fileRef = storage.ref().child(`assignments/${currentUser.uid}/${Date.now()}_${file.name}`);
-                    await fileRef.put(file);
-                    fileUrl = await fileRef.getDownloadURL();
-                    fileName = file.name;
-                }
-                
-                // Create assignment document
+                // REMOVED: file upload logic
+
+                // Create assignment document with no fileUrl/fileName from upload
                 const assignment = {
                     ...assignmentData,
                     teacherId: currentUser.uid,
                     teacherName: currentUser.displayName || currentUser.email,
-                    fileUrl,
-                    fileName,
+                    // REMOVED: fileUrl, fileName
                     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                     dueDate: firebase.firestore.Timestamp.fromDate(new Date(assignmentData.dueDate))
                 };
@@ -1806,8 +1669,8 @@
                 showView('dashboard-view');
             } catch (error) {
                 console.error("Error creating assignment:", error);
-                addNotification('error', 'Error', 'Error al crear la actividad');
-                displayError(createAssignmentFileError, 'Error al subir archivo o crear actividad.');
+                addNotification('error', 'Error', 'Error al crear la actividad.');
+                // REMOVED: displayError(createAssignmentFileError, 'Error al crear actividad.');
             } finally {
                 setLoadingState(submitCreateAssignmentBtn, createAssignmentButtonText, createAssignmentSpinner, false);
             }
@@ -1819,12 +1682,14 @@
 
             submitAssignmentTitleSpan.textContent = assignment.title;
             submitAssignmentDescriptionP.textContent = assignment.description;
-            submissionTextInput.value = ''; // Limpiar campo de texto
-            fileToUploadForSubmission = null; // Limpiar archivo seleccionado
-            submissionSelectedFileDisplay.innerHTML = '';
-            hideError(submissionFileError);
+            submissionWorkTitleInput.value = ''; // NEW: Clear work title input
+            submissionLinkInput.value = ''; // NEW: Clear link input
+            // REMOVED: submissionTextInput.value = ''; // Old text area
+            // REMOVED: fileToUploadForSubmission = null; // Old file
+            // REMOVED: submissionSelectedFileDisplay.innerHTML = '';
+            // REMOVED: hideError(submissionFileError);
 
-            // Mostrar material adjunto si existe
+            // Mostrar material adjunto si existe (sin cambios, solo descarga)
             if (assignment.fileUrl) {
                 submitAssignmentMaterialDiv.innerHTML = `
                     <div class="bg-gray-700 p-4 rounded-lg border border-gray-600 mb-4">
@@ -1841,17 +1706,21 @@
 
             // Si es modo solo ver, deshabilitar formulario de entrega
             if (isViewMode || assignment.submittedByUser) {
-                submissionTextInput.disabled = true;
-                submissionFileInput.disabled = true;
-                submissionDropzone.classList.add('opacity-50', 'cursor-not-allowed');
+                submissionWorkTitleInput.disabled = true; // NEW
+                submissionLinkInput.disabled = true; // NEW
+                // REMOVED: submissionTextInput.disabled = true; // Old text area
+                // REMOVED: submissionFileInput.disabled = true; // Old file
+                // REMOVED: submissionDropzone.classList.add('opacity-50', 'cursor-not-allowed'); // Old file
                 submitSubmissionBtn.disabled = true;
                 submitSubmissionBtn.textContent = 'Actividad Ya Entregada / Solo Ver';
                 submitSubmissionBtn.classList.remove('bg-green-500', 'hover:bg-green-600');
                 submitSubmissionBtn.classList.add('bg-gray-600', 'disabled:bg-gray-700');
             } else {
-                submissionTextInput.disabled = false;
-                submissionFileInput.disabled = false;
-                submissionDropzone.classList.remove('opacity-50', 'cursor-not-allowed');
+                submissionWorkTitleInput.disabled = false; // NEW
+                submissionLinkInput.disabled = false; // NEW
+                // REMOVED: submissionTextInput.disabled = false; // Old text area
+                // REMOVED: submissionFileInput.disabled = false; // Old file
+                // REMOVED: submissionDropzone.classList.remove('opacity-50', 'cursor-not-allowed'); // Old file
                 submitSubmissionBtn.disabled = false;
                 submitSubmissionBtn.textContent = 'Entregar Actividad';
                 submitSubmissionBtn.classList.add('bg-green-500', 'hover:bg-green-600');
@@ -1859,28 +1728,29 @@
             }
         }
 
-        async function submitAssignment(assignmentId, submissionText, file) {
+        async function submitAssignment(assignmentId) { // REMOVED: submissionText, file parameters
             setLoadingState(submitSubmissionBtn, submitSubmissionButtonText, submitSubmissionSpinner, true);
-            hideError(submissionFileError);
+            // REMOVED: hideError(submissionFileError);
+
+            const workTitle = submissionWorkTitleInput.value.trim(); // NEW
+            const workLink = submissionLinkInput.value.trim(); // NEW
+
+            if (!workTitle || !workLink) { // NEW Validation
+                addNotification('warning', 'Advertencia', 'Por favor, introduce el título del trabajo y el enlace.');
+                setLoadingState(submitSubmissionBtn, submitSubmissionButtonText, submitSubmissionSpinner, false);
+                return;
+            }
 
             try {
-                let fileUrl = null;
-                let fileName = null;
-                
-                if (file) {
-                    const fileRef = storage.ref().child(`submissions/${assignmentId}/${currentUser.uid}_${Date.now()}_${file.name}`);
-                    await fileRef.put(file);
-                    fileUrl = await fileRef.getDownloadURL();
-                    fileName = file.name;
-                }
+                // REMOVED: file upload logic
 
                 await db.collection('submissions').add({
                     assignmentId,
                     studentId: currentUser.uid,
                     studentName: currentUser.displayName || currentUser.email,
-                    submissionText,
-                    fileUrl,
-                    fileName,
+                    submittedWorkTitle: workTitle, // NEW
+                    submittedWorkLink: workLink, // NEW
+                    // REMOVED: submissionText, fileUrl, fileName
                     submittedAt: firebase.firestore.FieldValue.serverTimestamp(),
                     graded: false,
                     grade: null,
@@ -1892,7 +1762,7 @@
             } catch (error) {
                 console.error("Error submitting assignment:", error);
                 addNotification('error', 'Error', 'Error al entregar la actividad.');
-                displayError(submissionFileError, 'Error al subir archivo o entregar actividad.');
+                // REMOVED: displayError(submissionFileError, 'Error al entregar actividad.');
             } finally {
                 setLoadingState(submitSubmissionBtn, submitSubmissionButtonText, submitSubmissionSpinner, false);
             }
@@ -2193,17 +2063,18 @@
                         const submission = doc.data();
                         const submissionItem = document.createElement('div');
                         submissionItem.className = 'bg-gray-700 p-4 rounded-lg shadow-md border border-gray-600 mb-4'; // Added mb-4 for spacing
+                        
+                        // Displaying submitted work title and link
                         submissionItem.innerHTML = `
                             <div class="flex justify-between items-center mb-2">
                                 <h4 class="text-lg font-semibold text-gray-200">${submission.studentName || 'Estudiante Desconocido'}</h4>
                                 <span class="text-sm text-gray-400">Entregado: ${formatDate(submission.submittedAt)}</span>
                             </div>
-                            ${submission.submissionText ? `
-                            <p class="text-gray-300 text-sm mb-2">Respuesta: <span class="italic">${submission.submissionText}</span></p>` : ''}
-                            ${submission.fileUrl ? `
+                            <p class="text-gray-300 text-sm mb-2">Título del Trabajo: <span class="italic">${submission.submittedWorkTitle || 'N/A'}</span></p>
+                            ${submission.submittedWorkLink ? `
                             <div class="flex items-center space-x-2 text-blue-400 text-sm">
-                                <span>📎</span>
-                                <a href="${submission.fileUrl}" target="_blank" rel="noopener noreferrer" class="hover:underline">Descargar archivo: ${submission.fileName || 'archivo'}</a>
+                                <span>🔗</span>
+                                <a href="${submission.submittedWorkLink}" target="_blank" rel="noopener noreferrer" class="hover:underline">Ver Trabajo</a>
                             </div>` : ''}
                             `;
                         assignmentSubmissionsList.appendChild(submissionItem);
@@ -2307,11 +2178,11 @@
         });
 
 
-        // Event listeners para la carga de archivos en "Crear Actividad"
-        createAssignmentDropzone.addEventListener('dragover', (e) => { e.preventDefault(); createAssignmentDropzone.classList.add('border-red-500', 'bg-red-50', 'bg-opacity-10', 'transform', 'scale-105'); });
-        createAssignmentDropzone.addEventListener('dragleave', () => { createAssignmentDropzone.classList.remove('border-red-500', 'bg-red-50', 'bg-opacity-10', 'transform', 'scale-105'); });
-        createAssignmentDropzone.addEventListener('drop', (e) => handleFileSelection(e, createAssignmentFileInput, createAssignmentDropzone, createAssignmentFileError, createAssignmentSelectedFileDisplay, (file) => fileToUploadForAssignment = file, ".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png", 10));
-        createAssignmentFileInput.addEventListener('change', (e) => handleFileSelection(e, createAssignmentFileInput, createAssignmentDropzone, createAssignmentFileError, createAssignmentSelectedFileDisplay, (file) => fileToUploadForAssignment = file, ".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png", 10));
+        // REMOVED: Event listeners para la carga de archivos en "Crear Actividad" (no se suben archivos aquí)
+        // createAssignmentDropzone.addEventListener('dragover', (e) => { e.preventDefault(); createAssignmentDropzone.classList.add('border-red-500', 'bg-red-50', 'bg-opacity-10', 'transform', 'scale-105'); });
+        // createAssignmentDropzone.addEventListener('dragleave', () => { createAssignmentDropzone.classList.remove('border-red-500', 'bg-red-50', 'bg-opacity-10', 'transform', 'scale-105'); });
+        // createAssignmentDropzone.addEventListener('drop', (e) => handleFileSelection(e, createAssignmentFileInput, createAssignmentDropzone, createAssignmentFileError, createAssignmentSelectedFileDisplay, (file) => fileToUploadForAssignment = file, ".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png", 10));
+        // createAssignmentFileInput.addEventListener('change', (e) => handleFileSelection(e, createAssignmentFileInput, createAssignmentDropzone, createAssignmentFileError, createAssignmentSelectedFileDisplay, (file) => fileToUploadForAssignment = file, ".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png", 10));
 
         // Event listener para el botón de cancelar en "Crear Actividad"
         cancelCreateAssignmentBtn.addEventListener('click', () => {
@@ -2336,14 +2207,14 @@
             }
 
             const assignmentData = { title, description, dueDate };
-            await createAssignment(assignmentData, fileToUploadForAssignment);
+            await createAssignment(assignmentData); // REMOVED: fileToUploadForAssignment
         });
 
-        // Event listeners para la carga de archivos en "Entregar Actividad"
-        submissionDropzone.addEventListener('dragover', (e) => { e.preventDefault(); submissionDropzone.classList.add('border-red-500', 'bg-red-50', 'bg-opacity-10', 'transform', 'scale-105'); });
-        submissionDropzone.addEventListener('dragleave', () => { submissionDropzone.classList.remove('border-red-500', 'bg-red-50', 'bg-opacity-10', 'transform', 'scale-105'); });
-        submissionDropzone.addEventListener('drop', (e) => handleFileSelection(e, submissionFileInput, submissionDropzone, submissionFileError, submissionSelectedFileDisplay, (file) => fileToUploadForSubmission = file, ".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png", 10));
-        submissionFileInput.addEventListener('change', (e) => handleFileSelection(e, submissionFileInput, submissionDropzone, submissionFileError, submissionSelectedFileDisplay, (file) => fileToUploadForSubmission = file, ".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png", 10));
+        // REMOVED: Event listeners para la carga de archivos en "Entregar Actividad"
+        // submissionDropzone.addEventListener('dragover', (e) => { e.preventDefault(); submissionDropzone.classList.add('border-red-500', 'bg-red-50', 'bg-opacity-10', 'transform', 'scale-105'); });
+        // submissionDropzone.addEventListener('dragleave', () => { submissionDropzone.classList.remove('border-red-500', 'bg-red-50', 'bg-opacity-10', 'transform', 'scale-105'); });
+        // submissionDropzone.addEventListener('drop', (e) => handleFileSelection(e, submissionFileInput, submissionDropzone, submissionFileError, submissionSelectedFileDisplay, (file) => fileToUploadForSubmission = file, ".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png", 10));
+        // submissionFileInput.addEventListener('change', (e) => handleFileSelection(e, submissionFileInput, submissionDropzone, submissionFileError, submissionSelectedFileDisplay, (file) => fileToUploadForSubmission = file, ".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png", 10));
 
         // Event listener para el botón de cancelar en "Entregar Actividad"
         cancelSubmitAssignmentBtn.addEventListener('click', () => {
@@ -2363,13 +2234,13 @@
                 return;
             }
 
-            const submissionText = submissionTextInput.value;
-            if (!submissionText && !fileToUploadForSubmission) {
-                addNotification('warning', 'Advertencia', 'Por favor, introduce tu respuesta o sube un archivo.');
-                return;
-            }
+            // const submissionText = submissionTextInput.value; // REMOVED
+            // if (!submissionText && !fileToUploadForSubmission) { // REMOVED validation
+            //     addNotification('warning', 'Advertencia', 'Por favor, introduce tu respuesta o sube un archivo.');
+            //     return;
+            // }
 
-            await submitAssignment(currentAssignmentData.id, submissionText, fileToUploadForSubmission);
+            await submitAssignment(currentAssignmentData.id); // UPDATED: no longer passes text/file, retrieves from inputs
         });
 
         // Event listeners para la creación de Quiz
